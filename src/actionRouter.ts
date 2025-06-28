@@ -3,6 +3,7 @@ import { Database, User } from './db/database';
 import { Action, ActionContext } from './actions/baseAction';
 import { StartAction } from './actions/startAction';
 import { HelpAction } from './actions/helpAction';
+import { ImageUploadAction } from './actions/imageUploadAction';
 
 type ActionClass = new (db: Database) => Action;
 
@@ -23,6 +24,10 @@ export class ActionRouter {
     const state = user.state;
 
     let actionClass: ActionClass | undefined;
+
+    if (msg.photo) {
+      return new ImageUploadAction(this.db);
+    }
 
     // First, check for commands
     if (text.startsWith('/')) {

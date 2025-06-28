@@ -26,7 +26,14 @@ export class Database {
         telegram_id INTEGER UNIQUE,
         state TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
+      );
+      CREATE TABLE IF NOT EXISTS user_images (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        image_url TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+      );
     `);
   }
 
@@ -40,5 +47,9 @@ export class Database {
 
   async updateUserState(telegramId: number, state: string): Promise<void> {
     await this.db.run('UPDATE users SET state = ? WHERE telegram_id = ?', state, telegramId);
+  }
+
+  async addUserImage(userId: number, imageUrl: string): Promise<void> {
+    await this.db.run('INSERT INTO user_images (user_id, image_url) VALUES (?, ?)', userId, imageUrl);
   }
 }
