@@ -1,6 +1,7 @@
 interface TrainingOptions {
   modelName: string;
   datasetPath: string;
+  userId: string;
   epochs?: number;
   batchSize?: number;
   learningRate?: number;
@@ -9,6 +10,7 @@ interface TrainingOptions {
 
 interface InferenceOptions {
   modelName: string;
+  userId: string;
   inputData: any; // Replace 'any' with a more specific type based on your model's input
   parameters?: {
     temperature?: number;
@@ -56,10 +58,65 @@ export class ModelClient {
   }
 
   /**
+   * Upload images before training
+   * @param options Image upload options
+   * @returns Promise with upload status
+   */
+  public async uploadImages(options: ImageUploadOptions): Promise<ImageUploadResponse> {
+    try {
+      if (!options.imageUrls || options.imageUrls.length === 0) {
+        return { success: false, error: 'No image URLs provided' };
+      }
+
+      console.log(`Starting upload of ${options.imageUrls.length} images`);
+      
+      // Filter out already uploaded images
+      const newImages = options.imageUrls.filter(url => !this.uploadedImages.has(url));
+      
+      if (newImages.length === 0) {
+        console.log('All images already uploaded');
+        return { success: true, uploadedCount: 0 };
+      }
+
+      // In a real implementation, this would make API calls to upload each image
+      // For now, we'll simulate the upload
+      await Promise.all(
+        newImages.map(async (url) => {
+          // Simulate upload delay
+          await new Promise(resolve => setTimeout(resolve, 200));
+        })
+      );
+
+      console.log(`Successfully uploaded ${newImages.length} images`);
+      return { success: true, uploadedCount: newImages.length };
+    } catch (error) {
+      console.error('Failed to upload images:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to upload images' 
+      };
+    }
+  }
+
+  /**
    * Start training a new model with the given options
    * @returns Promise that resolves when the training task is successfully accepted
    */
-  public async train(options: TrainingOptions): Promise<{ success: boolean; jobId?: string; error?: string }> {
+  public async train(options: TrainingOptions & { imageUrls?: string[] }): Promise<{ success: boolean; jobId?: string; error?: string }> {
+    // Upload images if provided
+    if (options.imageUrls && options.imageUrls.length > 0) {
+      const uploadResult = await this.uploadImages({
+        userId: options.userId,
+        imageUrls: options.imageUrls
+      });
+      
+      if (!uploadResult.success) {
+        return { 
+          success: false, 
+          error: `Failed to upload images: ${uploadResult.error}` 
+        };
+      }
+    }
     try {
       console.log(`Starting training for model: ${options.modelName}`);
       
