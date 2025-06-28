@@ -34,6 +34,18 @@ interface InferenceResponse {
   error?: string;
 }
 
+interface ImageUploadOptions {
+  userId: string;
+  imageUrls: string[];  // List of S3 URLs
+  metadata?: Record<string, any>;  // Optional metadata
+}
+
+interface ImageUploadResponse {
+  success: boolean;
+  uploadedCount?: number;
+  error?: string;
+}
+
 export class ModelClient {
   private apiKey: string;
   private baseUrl: string;
@@ -82,6 +94,68 @@ export class ModelClient {
       // The actual training completion would be handled by a webhook or polling mechanism
     } catch (error) {
       console.error(`Training job ${jobId} failed:`, error);
+    }
+  }
+
+  /**
+   * Upload images from S3 links for a specific user
+   * @param options Configuration for the image upload
+   * @returns Promise with the upload result
+   */
+  public async uploadImages(options: ImageUploadOptions): Promise<ImageUploadResponse> {
+    try {
+      const { userId, imageUrls, metadata = {} } = options;
+      
+      if (!userId) {
+        throw new Error('User ID is required');
+      }
+      
+      if (!imageUrls || !Array.isArray(imageUrls) || imageUrls.length === 0) {
+        throw new Error('At least one image URL is required');
+      }
+      
+      // Validate that all URLs are valid S3 URLs
+      const invalidUrls = imageUrls.filter(url => !this.isValidS3Url(url));
+      if (invalidUrls.length > 0) {
+        throw new Error(`Invalid S3 URL(s) provided: ${invalidUrls.join(', ')}`);
+      }
+      
+      // In a real implementation, you would process the images here
+      // This could include:
+      // 1. Validating the images exist in S3
+      // 2. Processing the images (resizing, converting formats, etc.)
+      // 3. Storing references to the processed images
+      
+      console.log(`Processing ${imageUrls.length} images for user ${userId}`);
+      
+      // Simulate processing delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      return {
+        success: true,
+        uploadedCount: imageUrls.length
+      };
+      
+    } catch (error) {
+      console.error('Failed to upload images:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to upload images'
+      };
+    }
+  }
+  
+  /**
+   * Validates if a URL is a valid S3 URL
+   * @private
+   */
+  private isValidS3Url(url: string): boolean {
+    try {
+      const urlObj = new URL(url);
+      return urlObj.hostname.endsWith('.amazonaws.com') && 
+             urlObj.pathname.includes('/');
+    } catch (e) {
+      return false;
     }
   }
 
