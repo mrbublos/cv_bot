@@ -15,6 +15,15 @@ export class Database {
     this.connect(dbPath);
   }
 
+  private async ensureConnected() {
+    if (!this.db) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      if (!this.db) {
+        throw new Error('Database connection not established');
+      }
+    }
+  }
+
   private async connect(dbPath: string) {
     this.db = await open({
       filename: dbPath,
@@ -34,22 +43,132 @@ export class Database {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users (id)
       );
+      CREATE TABLE IF NOT EXISTS training_status (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT UNIQUE,
+        status TEXT CHECK(status IN ('not_started', 'in_progress', 'completed')),
+        started_at DATETIME,
+        completed_at DATETIME,
+        model_id TEXT,
+        job_id TEXT,
+        training_parameters TEXT, -- Store as JSON string
+        FOREIGN KEY (user_id) REFERENCES users (id)
+      );
     `);
   }
 
-  async getUser(telegramId: number): Promise<User | undefined> {
+  async getUser(telegramId: string): Promise<User | undefined> {
     return this.db.get('SELECT * FROM users WHERE telegram_id = ?', telegramId);
   }
 
-  async createUser(telegramId: number): Promise<void> {
+  async createUser(telegramId: string): Promise<void> {
     await this.db.run('INSERT INTO users (telegram_id, state) VALUES (?, ?)', telegramId, 'start');
   }
 
-  async updateUserState(telegramId: number, state: string): Promise<void> {
+  async updateUserState(telegramId: string, state: string): Promise<void> {
     await this.db.run('UPDATE users SET state = ? WHERE telegram_id = ?', state, telegramId);
   }
 
-  async addUserImage(userId: number, imageUrl: string): Promise<void> {
+  async addUserImage(userId: string, imageUrl: string): Promise<void> {
+    await this.ensureConnected();
     await this.db.run('INSERT INTO user_images (user_id, image_url) VALUES (?, ?)', userId, imageUrl);
+  }
+
+  async getUserImageCount(userId: string): Promise<number> {
+    await this.ensureConnected();
+    const result = await this.db.get<{count: number}>(
+      'SELECT COUNT(*) as count FROM user_images WHERE user_id = ?', 
+      userId
+    );
+    return result?.count || 0;
+  }
+
+  async getTrainingStatus(userId: string): Promise<{
+    status: string;
+    model_id?: string;
+    job_id?: string;
+    training_parameters?: any;
+    started_at?: string;
+    completed_at?: string;
+  }> {
+    await this.ensureConnected();
+    const result = await this.db.get<{
+      status: string;
+      model_id?: string;
+      job_id?: string;
+      training_parameters?: string;
+      started_at?: string;
+      completed_at?: string;
+    }>(
+      'SELECT status, model_id, job_id, training_parameters, started_at, completed_at FROM training_status WHERE user_id = ?',
+      userId
+    );
+
+    if (!result) {
+      return { status: 'not_started' };
+    }
+
+    return {
+      status: result.status,
+      model_id: result.model_id,
+      job_id: result.job_id,
+      training_parameters: result.training_parameters ? JSON.parse(result.training_parameters) : undefined,
+      started_at: result.started_at,
+      completed_at: result.completed_at
+    };
+  }
+
+  async startTraining(userId: string, params: any = {}): Promise<void> {
+    await this.ensureConnected();
+    const paramsJson = JSON.stringify(params);
+    await this.db.run(
+      `INSERT INTO training_status
+       (user_id, status, started_at, model_id, completed_at, training_parameters) 
+       VALUES (?, ?, CURRENT_TIMESTAMP, NULL, NULL, ?)`,
+      userId,
+      'in_progress',
+      paramsJson
+    );
+  }
+
+  async completeTraining(userId: string, modelId: string): Promise<void> {
+    await this.ensureConnected();
+    await this.db.run(
+      'UPDATE training_status SET status = ?, completed_at = CURRENT_TIMESTAMP, model_id = ? WHERE user_id = ?',
+      'completed',
+      modelId,
+      userId
+    );
+  }
+
+  async getUserImages(userId: string): Promise<{id: number, user_id: string, image_url: string, created_at: string}[]> {
+    await this.ensureConnected();
+    return this.db.all(
+      'SELECT id, user_id, image_url, created_at FROM user_images WHERE user_id = ? ORDER BY created_at',
+      userId
+    );
+  }
+
+  async updateTrainingJobId(userId: string, jobId: string): Promise<void> {
+    await this.ensureConnected();
+    await this.db.run(
+      'UPDATE training_status SET job_id = ? WHERE user_id = ?',
+      jobId,
+      userId
+    );
+  }
+
+  async resetTrainingStatus(userId: string): Promise<void> {
+    await this.ensureConnected();
+    await this.db.run(
+      `UPDATE training_status 
+       SET status = 'not_started', 
+           started_at = NULL, 
+           completed_at = NULL, 
+           model_id = NULL,
+           job_id = NULL 
+       WHERE user_id = ?`,
+      userId
+    );
   }
 }
