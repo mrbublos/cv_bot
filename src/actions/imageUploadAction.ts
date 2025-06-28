@@ -26,11 +26,9 @@ export class ImageUploadAction extends Action {
                 epochs: 10,
                 batchSize: 8,
                 learningRate: 0.001,
-                startedAt: new Date().toISOString()
+                startedAt: new Date().toISOString(),
+                userId,
             };
-            
-            // Mark training as started in the database with parameters
-            await this.db.startTraining(userId, trainingParams);
             
             // Start training and get immediate response
             const trainResponse = await this.modelClient.train(trainingParams);
@@ -38,7 +36,9 @@ export class ImageUploadAction extends Action {
             if (!trainResponse.success) {
                 throw new Error(trainResponse.error || 'Failed to start training');
             }
-            
+
+            await this.db.startTraining(userId, trainingParams);
+
             // Store the job ID for future reference
             await this.db.updateTrainingJobId(userId, trainResponse.jobId!);
             
