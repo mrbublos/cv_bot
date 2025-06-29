@@ -45,7 +45,7 @@ export class Database {
       CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         telegram_id VARCHAR UNIQUE,
-        state TEXT,
+        chat_id VARCHAR UNIQUE,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
       CREATE TABLE IF NOT EXISTS user_images (
@@ -74,13 +74,10 @@ export class Database {
     return this.db.get('SELECT * FROM users WHERE telegram_id = ?', telegramId);
   }
 
-  async createUser(telegramId: string): Promise<void> {
-    await this.db.run('INSERT INTO users (telegram_id, state) VALUES (?, ?)', telegramId, 'start');
+  async createUser(telegramId: string, chatId: string): Promise<void> {
+    await this.db.run('INSERT INTO users (telegram_id, chat_id) VALUES (?, ?, ?)', telegramId, chatId);
   }
 
-  async updateUserState(telegramId: string, state: string): Promise<void> {
-    await this.db.run('UPDATE users SET state = ? WHERE telegram_id = ?', state, telegramId);
-  }
 
   async addUserImage(userId: string, imageUrl: string): Promise<void> {
     await this.ensureConnected();

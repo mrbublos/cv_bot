@@ -4,11 +4,11 @@ import {Database} from './db/database';
 import {RunpodInferenceStatusJob} from "./jobs/runpodInferenceStatusJob";
 import TelegramBot from "node-telegram-bot-api";
 
-export async function initializeJobSystem(db: Database, bot: TelegramBot): Promise<JobManager> {
+export function initializeJobSystem(db: Database, bot: TelegramBot): JobManager {
   // Create job manager with database instance
   const jobManager = new JobManager(db);
   
-  jobManager.registerHandler('monitor-training-status', new RunpodTrainingStatusJob(db));
+  jobManager.registerHandler('monitor-training-status', new RunpodTrainingStatusJob(db, bot));
   jobManager.registerHandler('generate-image', new RunpodInferenceStatusJob(bot));
 
   console.log('Job system initialized with training status monitoring');
