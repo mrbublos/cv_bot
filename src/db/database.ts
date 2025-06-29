@@ -30,6 +30,18 @@ export class Database {
       driver: sqlite3.Database,
     });
     await this.db.exec(`
+      CREATE TABLE IF NOT EXISTS jobs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        type TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        payload TEXT,
+        result TEXT,
+        error TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        started_at DATETIME,
+        completed_at DATETIME
+      );
+
       CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         telegram_id INTEGER UNIQUE,
@@ -56,6 +68,8 @@ export class Database {
       );
     `);
   }
+
+  // Job related methods have been moved to JobRepository
 
   async getUser(telegramId: string): Promise<User | undefined> {
     return this.db.get('SELECT * FROM users WHERE telegram_id = ?', telegramId);
