@@ -4,8 +4,14 @@ import { config } from '../config';
 class S3Client {
     private s3: AWS.S3;
     private bucketName: string;
+    private enabled: boolean = true;
 
     constructor() {
+        if (!config.s3.enabled) {
+            this.enabled = false;
+            return
+        }
+
         if (!config.s3.accessKeyId || !config.s3.secretAccessKey || !config.s3.region || !config.s3.bucketName) {
             throw new Error('S3 credentials are not configured in .env file');
         }
@@ -25,6 +31,10 @@ class S3Client {
     }
 
     public async save(fileName: string, content: Buffer): Promise<string> {
+        if (!this.enabled) {
+            return uuidv4();
+        }
+
         const params = {
             Bucket: this.bucketName,
             Key: fileName,
@@ -36,6 +46,10 @@ class S3Client {
     }
 
     public async load(fileName: string): Promise<Buffer> {
+        if (!this.enabled) {
+            throw new Error('S3 is not enabled');
+        }
+
         const params = {
             Bucket: this.bucketName,
             Key: fileName,
