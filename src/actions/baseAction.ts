@@ -1,5 +1,6 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { Database, User } from '../db/database';
+import {JobManager} from "../jobs";
 
 export interface ActionContext {
   bot: TelegramBot;
@@ -9,9 +10,13 @@ export interface ActionContext {
 
 export abstract class Action {
   protected db: Database;
+  protected jobManager: JobManager;
+  protected bot: TelegramBot;
 
-  constructor(db: Database) {
+  constructor(db: Database, jobManager: JobManager, bot: TelegramBot) {
     this.db = db;
+    this.jobManager = jobManager;
+    this.bot = bot;
   }
 
   abstract execute(context: ActionContext): void;

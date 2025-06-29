@@ -1,18 +1,24 @@
-import { Database } from '../db/database';
-import { JobData, JobHandler, JobStatus } from './types';
+import {Database} from '../db/database';
+import {JobData, JobHandler} from './types';
+import {JobRepository} from "../repositories";
+
+export type JobType = 'monitor-training-status' | 'generate-image';
 
 export class JobManager {
-  private handlers: Map<string, JobHandler> = new Map();
+  private handlers: Map<JobType, JobHandler> = new Map();
   private isProcessing = false;
   private processingInterval: NodeJS.Timeout | null = null;
+  private jobRepository: JobRepository;
 
-  constructor(private db: Database) {}
+  constructor(private readonly db: Database) {
+    this.jobRepository = new JobRepository(db);
+  }
 
-  registerHandler(type: string, handler: JobHandler) {
+  registerHandler(type: JobType, handler: JobHandler) {
     this.handlers.set(type, handler);
   }
 
-  async createJob<T = any>(type: string, payload?: T): Promise<number> {
+  async createJob<T = any>(type: JobType, payload?: T): Promise<number | undefined> {
     const jobId = await this.db.createJob(type, payload);
     this.processJobs(); // Trigger processing if not already running
     return jobId;

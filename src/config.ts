@@ -20,6 +20,7 @@ export const config = {
             trainEndpoint: process.env.RUNPOD_TRAIN_POD,
             inferenceEndpoint: process.env.RUNPOD_INFERENCE_POD,
             apiKey: process.env.RUNPOD_API_KEY,
+            baseUrl: process.env.RUNPOD_URL,
         },
     },
 };

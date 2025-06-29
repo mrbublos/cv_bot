@@ -3,7 +3,7 @@ import { open, Database as SqliteDatabase } from 'sqlite';
 
 export interface User {
   id: number;
-  telegram_id: number;
+  telegram_id: string;
   state: string;
   created_at: string;
 }
@@ -44,24 +44,23 @@ export class Database {
 
       CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        telegram_id INTEGER UNIQUE,
+        telegram_id VARCHAR UNIQUE,
         state TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
       CREATE TABLE IF NOT EXISTS user_images (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
+        user_id VARCHAR,
         image_url TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users (id)
       );
       CREATE TABLE IF NOT EXISTS training_status (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id TEXT UNIQUE,
+        user_id VARCHAR UNIQUE,
         status TEXT CHECK(status IN ('not_started', 'in_progress', 'completed')),
         started_at DATETIME,
         completed_at DATETIME,
-        model_id TEXT,
         job_id TEXT,
         training_parameters TEXT, -- Store as JSON string
         FOREIGN KEY (user_id) REFERENCES users (id)
@@ -145,13 +144,21 @@ export class Database {
     );
   }
 
-  async completeTraining(userId: string, modelId: string): Promise<void> {
+  async completeTraining(userId: string): Promise<void> {
     await this.ensureConnected();
     await this.db.run(
-      'UPDATE training_status SET status = ?, completed_at = CURRENT_TIMESTAMP, model_id = ? WHERE user_id = ?',
+      'UPDATE training_status SET status = ?, completed_at = CURRENT_TIMESTAMP WHERE user_id = ?',
       'completed',
-      modelId,
       userId
+    );
+  }
+
+  async failTraining(userId: string): Promise<void> {
+    await this.ensureConnected();
+    await this.db.run(
+        'UPDATE training_status SET status = ?, completed_at = CURRENT_TIMESTAMP WHERE user_id = ?',
+        'failed',
+        userId
     );
   }
 
@@ -170,6 +177,16 @@ export class Database {
       jobId,
       userId
     );
+  }
+
+  async createJob(type: string, payload: any): Promise<number | undefined> {
+    await this.ensureConnected();
+    const result = await this.db.run(
+      'INSERT INTO jobs (type, payload) VALUES (?, ?)',
+      type,
+      JSON.stringify(payload)
+    );
+    return result.lastID;
   }
 
   async resetTrainingStatus(userId: string): Promise<void> {

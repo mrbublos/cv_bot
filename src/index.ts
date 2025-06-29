@@ -2,6 +2,8 @@ import TelegramBot from 'node-telegram-bot-api';
 import dotenv from 'dotenv';
 import { Database, User } from './db/database';
 import { ActionRouter } from './actionRouter';
+import { ModelClient } from './runpodModelClient';
+import { initializeJobSystem } from './initJobs';
 
 dotenv.config();
 
@@ -14,7 +16,8 @@ if (!token) {
 
 const bot = new TelegramBot(token, { polling: true });
 const db = new Database('bot.db');
-const actionRouter = new ActionRouter(db);
+const jobManager = await initializeJobSystem(db);
+const actionRouter = new ActionRouter(db, jobManager);
 
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;

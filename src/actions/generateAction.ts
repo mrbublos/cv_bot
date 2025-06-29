@@ -1,20 +1,13 @@
-import { Action, ActionContext } from './baseAction';
-import { ModelClient } from '../modelClient';
-import { Database } from '../db/database';
-import { InputFile } from 'node-telegram-bot-api';
+import {Action, ActionContext} from './baseAction';
+import {RunpodModelClient} from "../runpodModelClient";
 
 export class GenerateAction extends Action {
-    private modelClient: ModelClient;
-
-    constructor(db: Database, modelClient: ModelClient) {
-        super(db);
-        this.modelClient = modelClient;
-    }
+    private modelClient = new RunpodModelClient();
 
     public async execute(context: ActionContext): Promise<void> {
         const { bot, msg, user } = context;
-        const chatId = msg.chat.id;
-        const userId = user.id;
+        const chatId = msg.chat.id.toString();
+        const userId = user.id.toString();
         const text = msg.text?.replace('/generate', '').trim();
 
         if (!text) {
@@ -33,21 +26,20 @@ export class GenerateAction extends Action {
             // Show typing indicator
             await bot.sendChatAction(chatId, 'typing');
 
-            // Call the model's infer function
+            // Call the model's infer function with proper parameters
             const result = await this.modelClient.infer({
                 userId,
-                prompt: text,
-                modelName: trainingStatus.modelName // Assuming modelName is stored in training status
+                inputData: {
+                    prompt: text,
+                    width: 512,  // Default width
+                    height: 512, // Default height
+                    loraStyles: [], // Empty array as stub
+                    loraPersonal: true // Default to personal LoRA
+                },
             });
 
-            if (result.success && result.imageData) {
-                // Create a buffer from the byte array
-                const imageBuffer = Buffer.from(result.imageData);
-                
-                // Send the image buffer directly
-                await bot.sendPhoto(chatId, imageBuffer, {
-                    caption: `🎨 Generated image for: "${text}"`
-                });
+            if (result.success) {
+                this.jobManager.createJob('generate-image', { userId, chatId, jobId: result.jobId });
             } else {
                 throw new Error(result.error || 'Failed to generate image');
             }

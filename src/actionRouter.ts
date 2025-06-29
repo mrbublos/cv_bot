@@ -4,15 +4,20 @@ import { Action, ActionContext } from './actions/baseAction';
 import { StartAction } from './actions/startAction';
 import { HelpAction } from './actions/helpAction';
 import { ImageUploadAction } from './actions/imageUploadAction';
+import {JobManager} from "./jobs";
 
-type ActionClass = new (db: Database) => Action;
+type ActionClass = new (db: Database, jobManager: JobManager, bot: TelegramBot) => Action;
 
 export class ActionRouter {
   private db: Database;
+  private jobManager: JobManager;
   private actions: { [key: string]: ActionClass };
+  private bot: TelegramBot;
 
-  constructor(db: Database) {
+  constructor(db: Database, jobManager: JobManager, bot: TelegramBot) {
     this.db = db;
+    this.jobManager = jobManager;
+    this.bot = bot;
     this.actions = {
       '/start': StartAction,
       '/help': HelpAction,
@@ -26,7 +31,7 @@ export class ActionRouter {
     let actionClass: ActionClass | undefined;
 
     if (msg.photo) {
-      return new ImageUploadAction(this.db);
+      return new ImageUploadAction(this.db, this.jobManager, this.bot);
     }
 
     // First, check for commands
@@ -40,7 +45,7 @@ export class ActionRouter {
     // }
 
     if (actionClass) {
-      return new actionClass(this.db);
+      return new actionClass(this.db, this.jobManager, this.bot);
     }
 
     return null;
