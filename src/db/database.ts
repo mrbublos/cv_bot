@@ -58,10 +58,11 @@ export class Database {
       CREATE TABLE IF NOT EXISTS training_status (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id VARCHAR UNIQUE,
-        status TEXT CHECK(status IN ('not_started', 'in_progress', 'completed')),
+        status TEXT CHECK(status IN ('not_started', 'in_progress', 'completed', 'failed')),
         started_at DATETIME,
         completed_at DATETIME,
         job_id TEXT,
+        model_id TEXT,
         training_parameters TEXT, -- Store as JSON string
         FOREIGN KEY (user_id) REFERENCES users (id)
       );
@@ -75,7 +76,7 @@ export class Database {
   }
 
   async createUser(telegramId: string, chatId: string): Promise<void> {
-    await this.db.run('INSERT INTO users (telegram_id, chat_id) VALUES (?, ?, ?)', telegramId, chatId);
+    await this.db.run('INSERT INTO users (telegram_id, chat_id) VALUES (?, ?)', telegramId, chatId);
   }
 
 
