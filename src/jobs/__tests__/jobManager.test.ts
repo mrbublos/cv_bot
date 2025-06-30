@@ -1,8 +1,8 @@
 import { mock, MockProxy } from 'jest-mock-extended';
 import { DatabaseClient } from '../../db/DatabaseClient';
-import { JobManager, JobType } from '../JobManager';
 import { JobRepository } from '../../repositories/JobRepository';
 import { JobData, JobHandler } from '../types';
+import {JobManager, JobType} from "../jobManager";
 
 describe('JobManager', () => {
   let db: MockProxy<DatabaseClient>;

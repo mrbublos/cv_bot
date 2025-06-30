@@ -1,6 +1,6 @@
 import TelegramBot from 'node-telegram-bot-api';
-import { Database, User } from '../db/database';
-import {JobManager} from "../jobs";
+import {Database, User} from '../db/database';
+import {JobManager} from "../jobs/jobManager";
 
 export interface ActionContext {
   bot: TelegramBot;

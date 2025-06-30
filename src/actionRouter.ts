@@ -1,19 +1,19 @@
 import TelegramBot from 'node-telegram-bot-api';
-import { Database, User } from './db/database';
-import { Action, ActionContext } from './actions/baseAction';
-import { StartAction } from './actions/startAction';
-import { HelpAction } from './actions/helpAction';
-import { ImageUploadAction } from './actions/imageUploadAction';
-import { ClearAction } from './actions/clearAction';
-import {JobManager} from "./jobs";
+import {Database, User} from './db/database';
+import {Action} from './actions/baseAction';
+import {StartAction} from './actions/startAction';
+import {HelpAction} from './actions/helpAction';
+import {ImageUploadAction} from './actions/imageUploadAction';
+import {ClearAction} from './actions/clearAction';
+import {JobManager} from "./jobs/jobManager";
 
 type ActionClass = new (db: Database, jobManager: JobManager, bot: TelegramBot) => Action;
 
 export class ActionRouter {
-  private db: Database;
-  private jobManager: JobManager;
-  private actions: { [key: string]: ActionClass };
-  private bot: TelegramBot;
+  private readonly db: Database;
+  private readonly jobManager: JobManager;
+  private readonly actions: { [key: string]: ActionClass };
+  private readonly bot: TelegramBot;
 
   constructor(db: Database, jobManager: JobManager, bot: TelegramBot) {
     this.db = db;
