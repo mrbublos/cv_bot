@@ -73,7 +73,6 @@ export class Database implements DatabaseClient {
         started_at DATETIME,
         completed_at DATETIME,
         job_id TEXT,
-        model_id TEXT,
         training_parameters TEXT, -- Store as JSON string
         FOREIGN KEY (user_id) REFERENCES users (id)
       );

@@ -42,9 +42,9 @@ interface ImageUploadResponse {
 
 export class RunpodModelClient {
     private axiosInstance: AxiosInstance;
-    private trainingPodId = config.modelClient.runpod.trainEndpoint;
-    private inferencePodId = config.modelClient.runpod.inferenceEndpoint
-    private collectPodId = config.modelClient.runpod.fileSaveEndpoint;
+    private trainingPodId = config.modelClient.runpod.trainPodId;
+    private inferencePodId = config.modelClient.runpod.inferencePodId
+    private collectPodId = config.modelClient.runpod.fileSavePodId;
 
 
     constructor() {
@@ -119,8 +119,6 @@ export class RunpodModelClient {
         }
 
         try {
-            const url = `https://api.runpod.ai/v2/${this.collectPodId}/runsync`;
-
             // Convert Uint8Array to base64
             const base64Image = Buffer.from(imageData).toString('base64');
 
@@ -133,6 +131,39 @@ export class RunpodModelClient {
             };
 
             console.log(`Uploading image (${imageData.length} bytes) for user ${userId} to RunPod`);
+
+            const response = await this.axiosInstance.post(`/${this.collectPodId}/runsync`, payload);
+
+            return {
+                success: true,
+                data: response.data
+            };
+        } catch (error) {
+            console.error('Failed to upload image to RunPod:', error);
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Failed to upload image to RunPod'
+            };
+        }
+    }
+    public async deleteUserData(
+        userId: string,
+    ): Promise<{ success: boolean; data?: any; error?: string }> {
+        if (!userId) {
+            throw new Error('User ID is required');
+        }
+
+        try {
+            const payload = {
+                input: {
+                    action: 'clear',
+                    extension: '', // Remove leading dot if present
+                    user_id: userId,
+                    data: '',
+                }
+            };
+
+            console.log(`Clearing data for user ${userId} to RunPod`);
 
             const response = await this.axiosInstance.post(`/${this.collectPodId}/runsync`, payload);
 
@@ -244,8 +275,7 @@ export class RunpodModelClient {
 
     public async getTrainingStatus(jobId: string): Promise<TrainingResponse> {
         try {
-            const url = `https://api.runpod.ai/v2/${this.trainingPodId}/status/${jobId}`;
-            const response = await this.axiosInstance.get(url);
+            const response = await this.axiosInstance.get(`/${this.trainingPodId}/status/${jobId}`);
 
             const status = response.data.status;
 
@@ -271,8 +301,7 @@ export class RunpodModelClient {
 
     public async getInferenceStatus(jobId: string): Promise<Buffer<ArrayBuffer> | undefined> {
         try {
-            const url = `https://api.runpod.ai/v2/${this.inferencePodId}/status/${jobId}`;
-            const response = await this.axiosInstance.get(url);
+            const response = await this.axiosInstance.get(`/${this.inferencePodId}/status/${jobId}`);
 
             const status = response.data.status;
 

@@ -21,9 +21,9 @@ export const config = {
     },
     modelClient: {
         runpod: {
-            fileSaveEndpoint: process.env.RUNPOD_ENDPOINT,
-            trainEndpoint: process.env.RUNPOD_TRAIN_POD,
-            inferenceEndpoint: process.env.RUNPOD_INFERENCE_POD,
+            fileSavePodId: process.env.RUNPOD_SAVE_FILE_POD,
+            trainPodId: process.env.RUNPOD_TRAIN_POD,
+            inferencePodId: process.env.RUNPOD_INFERENCE_POD,
             apiKey: process.env.RUNPOD_API_KEY,
             baseUrl: process.env.RUNPOD_URL,
         },

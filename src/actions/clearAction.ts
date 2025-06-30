@@ -1,7 +1,11 @@
 import { Action, ActionContext } from './baseAction';
 import { s3Client } from '../s3/s3';
+import {RunpodModelClient} from "../runpodModelClient";
 
 export class ClearAction extends Action {
+
+  private readonly modelClient = new RunpodModelClient();
+
   async execute(context: ActionContext): Promise<void> {
     const { msg, user } = context;
 
@@ -55,6 +59,8 @@ export class ClearAction extends Action {
             await this.db.deleteUserImages(user.telegram_id);
             await this.db.deleteTrainingStatus(user.telegram_id);
             await this.db.deleteUser(user.telegram_id);
+
+            await this.modelClient.deleteUserData(user.telegram_id);
 
             await this.bot.sendMessage(
               msg.chat.id,
