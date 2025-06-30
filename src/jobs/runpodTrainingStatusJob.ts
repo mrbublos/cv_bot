@@ -31,7 +31,7 @@ export class RunpodTrainingStatusJob implements JobHandler<TrainingStatusJobPayl
     while (attempts < this.MAX_ATTEMPTS) {
       try {
         const response = await this.modelClient.getTrainingStatus(jobId);
-        if (response.success) {
+        if (response.success && !response.pending) {
           return;
         }
 
