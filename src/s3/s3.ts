@@ -1,10 +1,11 @@
 import * as AWS from 'aws-sdk';
 import {config} from '../config';
+import {randomUUID} from "node:crypto";
 
 class S3Client {
-    private s3: AWS.S3 | null = null;
-    private bucketName: string = '';
-    private enabled: boolean = true;
+    private readonly s3: AWS.S3 | null = null;
+    private readonly bucketName: string = '';
+    private readonly enabled: boolean = true;
 
     constructor() {
         if (!config.s3.enabled) {
@@ -32,7 +33,8 @@ class S3Client {
 
     public async save(fileName: string, content: Buffer): Promise<string> {
         if (!this.enabled || !this.s3) {
-            throw new Error('S3 is not enabled or not properly initialized');
+            console.error('S3 is not enabled or not properly initialized');
+            return randomUUID();
         }
 
         const params = {
@@ -47,7 +49,8 @@ class S3Client {
 
     public async load(fileName: string): Promise<Buffer> {
         if (!this.enabled || !this.s3) {
-            throw new Error('S3 is not enabled or not properly initialized');
+            console.error('S3 is not enabled or not properly initialized');
+            return Buffer.from('');
         }
 
         const params = {

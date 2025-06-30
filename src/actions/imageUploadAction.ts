@@ -67,9 +67,17 @@ export class ImageUploadAction extends Action {
             const fileStream = bot.getFileStream(photo.file_id);
             const fileName = `${uuidv4()}.jpg`;
 
-            fileStream.on('data', async (chunk) => {
+            const chunks: Buffer[] = [];
+            
+            fileStream.on('data', (chunk) => {
+                chunks.push(chunk);
+            });
+
+            fileStream.on('end', async () => {
                 try {
-                    const s3Url = await s3Client.save(fileName, chunk);
+                    // Combine all chunks into a single buffer
+                    const fileBuffer = Buffer.concat(chunks);
+                    const s3Url = await s3Client.save(fileName, fileBuffer);
                     await this.db.addUserImage(userId, s3Url);
 
                     // Get current image count
@@ -83,9 +91,14 @@ export class ImageUploadAction extends Action {
                         await this.startTraining(chatId, userId);
                     }
                 } catch (error) {
-                    console.error(error);
+                    console.error('Error processing image:', error);
                     bot.sendMessage(chatId, '❌ Sorry, there was an error uploading your image.');
                 }
+            });
+
+            fileStream.on('error', (error) => {
+                console.error('File stream error:', error);
+                bot.sendMessage(chatId, '❌ Sorry, there was an error receiving your image.');
             });
         } else {
             bot.sendMessage(chatId, '📷 Please send an image.');
