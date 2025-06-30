@@ -1,9 +1,9 @@
 import * as AWS from 'aws-sdk';
-import { config } from '../config';
+import {config} from '../config';
 
 class S3Client {
-    private s3: AWS.S3;
-    private bucketName: string;
+    private s3: AWS.S3 | null = null;
+    private bucketName: string = '';
     private enabled: boolean = true;
 
     constructor() {
@@ -31,8 +31,8 @@ class S3Client {
     }
 
     public async save(fileName: string, content: Buffer): Promise<string> {
-        if (!this.enabled) {
-            return uuidv4();
+        if (!this.enabled || !this.s3) {
+            throw new Error('S3 is not enabled or not properly initialized');
         }
 
         const params = {
@@ -46,8 +46,8 @@ class S3Client {
     }
 
     public async load(fileName: string): Promise<Buffer> {
-        if (!this.enabled) {
-            throw new Error('S3 is not enabled');
+        if (!this.enabled || !this.s3) {
+            throw new Error('S3 is not enabled or not properly initialized');
         }
 
         const params = {
@@ -56,6 +56,9 @@ class S3Client {
         };
 
         const { Body } = await this.s3.getObject(params).promise();
+        if (!Body) {
+            throw new Error('No content returned from S3');
+        }
         return Body as Buffer;
     }
 }
