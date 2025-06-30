@@ -288,7 +288,7 @@ export class RunpodModelClient {
 
             return {
                 success: true,
-                pending: status === 'PENDING',
+                pending: status !== 'COMPLETED',
             };
         } catch (error) {
             console.error(`Failed to get training status for job ${jobId}:`, error);

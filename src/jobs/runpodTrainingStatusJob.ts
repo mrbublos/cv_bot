@@ -35,7 +35,7 @@ export class RunpodTrainingStatusJob implements JobHandler<TrainingStatusJobPayl
           return;
         }
 
-        console.log(`Training job ${jobId} status: ${status}, attempt ${attempts + 1}/${this.MAX_ATTEMPTS}`);
+        console.log(`Training job ${jobId}, attempt ${attempts + 1}/${this.MAX_ATTEMPTS}`);
         await this.sleep(this.POLL_INTERVAL_MS);
         attempts++;
       } catch (error) {
