@@ -211,4 +211,33 @@ export class Database implements DatabaseClient {
       userId
     );
   }
+
+  async deleteUserImages(userId: string): Promise<void> {
+    await this.ensureConnected();
+    await this.db.run('DELETE FROM user_images WHERE user_id = ?', userId);
+  }
+
+  async deleteTrainingStatus(userId: string): Promise<void> {
+    await this.ensureConnected();
+    await this.db.run('DELETE FROM training_status WHERE user_id = ?', userId);
+  }
+
+  async deleteUser(userId: string): Promise<void> {
+    await this.ensureConnected();
+    await this.db.run('DELETE FROM users WHERE telegram_id = ?', userId);
+  }
+
+  async extractImageFilenames(userId: string): Promise<string[]> {
+    await this.ensureConnected();
+    const images = await this.db.all<{image_url: string}[]>(
+      'SELECT image_url FROM user_images WHERE user_id = ?',
+      userId
+    );
+    return images.map(img => {
+      const url = img.image_url;
+      // Extract filename from the URL
+      const urlParts = url.split('/');
+      return urlParts[urlParts.length - 1];
+    });
+  }
 }

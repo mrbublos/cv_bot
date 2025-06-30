@@ -64,6 +64,20 @@ class S3Client {
         }
         return Body as Buffer;
     }
+
+    public async delete(fileName: string): Promise<void> {
+        if (!this.enabled || !this.s3) {
+            console.error('S3 is not enabled or not properly initialized');
+            return;
+        }
+
+        const params = {
+            Bucket: this.bucketName,
+            Key: fileName,
+        };
+
+        await this.s3.deleteObject(params).promise();
+    }
 }
 
 export const s3Client = new S3Client();

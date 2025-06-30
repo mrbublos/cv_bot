@@ -4,6 +4,7 @@ import { Action, ActionContext } from './actions/baseAction';
 import { StartAction } from './actions/startAction';
 import { HelpAction } from './actions/helpAction';
 import { ImageUploadAction } from './actions/imageUploadAction';
+import { ClearAction } from './actions/clearAction';
 import {JobManager} from "./jobs";
 
 type ActionClass = new (db: Database, jobManager: JobManager, bot: TelegramBot) => Action;
@@ -21,6 +22,7 @@ export class ActionRouter {
     this.actions = {
       '/start': StartAction,
       '/help': HelpAction,
+      '/clear': ClearAction,
     };
   }
 
