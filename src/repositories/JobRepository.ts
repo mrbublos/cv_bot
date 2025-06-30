@@ -1,7 +1,7 @@
-import { Database } from '../db/database';
+import { DatabaseClient } from '../db/DatabaseClient';
 
 export class JobRepository {
-  constructor(private db: Database) {}
+  constructor(private db: DatabaseClient) {}
 
   async createJob(type: string, payload?: any): Promise<number> {
     await this.db.ensureConnected();

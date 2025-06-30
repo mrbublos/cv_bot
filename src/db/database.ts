@@ -1,5 +1,6 @@
 import sqlite3 from 'sqlite3';
 import { open, Database as SqliteDatabase } from 'sqlite';
+import { DatabaseClient } from './DatabaseClient';
 
 export interface User {
   id: number;
@@ -8,20 +9,30 @@ export interface User {
   created_at: string;
 }
 
-export class Database {
+export class Database implements DatabaseClient {
   private db!: SqliteDatabase;
 
   constructor(dbPath: string) {
     this.connect(dbPath);
   }
 
-  private async ensureConnected() {
+  public async ensureConnected() {
     if (!this.db) {
       await new Promise(resolve => setTimeout(resolve, 100));
       if (!this.db) {
         throw new Error('Database connection not established');
       }
     }
+  }
+
+  public async run(sql: string, ...params: any[]): Promise<{ lastID?: number }> {
+    await this.ensureConnected();
+    return this.db.run(sql, ...params);
+  }
+
+  public async get(sql: string, ...params: any[]): Promise<any> {
+    await this.ensureConnected();
+    return this.db.get(sql, ...params);
   }
 
   private async connect(dbPath: string) {
