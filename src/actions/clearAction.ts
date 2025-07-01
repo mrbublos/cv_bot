@@ -60,7 +60,7 @@ export class ClearAction extends Action {
             await this.db.deleteTrainingStatus(user.telegram_id);
             await this.db.deleteUser(user.telegram_id);
 
-            await this.modelClient.deleteUserData(user.telegram_id);
+            await this.modelClient.deleteUserData(user.id.toString());
 
             await this.bot.sendMessage(
               msg.chat.id,

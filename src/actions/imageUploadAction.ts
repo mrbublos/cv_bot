@@ -65,7 +65,9 @@ export class ImageUploadAction extends Action {
         if (msg.photo && msg.photo.length > 0) {
             const photo = msg.photo[msg.photo.length - 1];
             const fileStream = bot.getFileStream(photo.file_id);
-            const fileName = `${uuidv4()}.jpg`;
+            const file = await bot.getFile(photo.file_id);
+            const extension = file.file_path?.split('.')?.pop() ?? '.jpg';
+            const fileName = `${uuidv4()}.${extension}`;
 
             const chunks: Buffer[] = [];
             
@@ -78,6 +80,8 @@ export class ImageUploadAction extends Action {
                     // Combine all chunks into a single buffer
                     const fileBuffer = Buffer.concat(chunks);
                     const s3Url = await s3Client.save(fileName, fileBuffer);
+                    await this.modelClient.uploadImage(userId, fileBuffer, extension);
+
                     await this.db.addUserImage(userId, s3Url);
 
                     // Get current image count

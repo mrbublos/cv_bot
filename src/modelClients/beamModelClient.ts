@@ -78,18 +78,13 @@ export class BeamModelClient {
             console.log(`Starting training for model: ${options.modelName}`);
 
             const payload = {
-                input: {
-                    user_id: options.userId,
-                    model_name: options.modelName,
-                    epochs: options.epochs,
-                    batch_size: options.batchSize,
-                    learning_rate: options.learningRate
-                }
+                user_id: options.userId,
+                steps: 500,
             };
 
             const response = await this.axiosInstance.post(config.modelClient.beam.trainUrl!, payload);
 
-            const jobId = response.data.id;
+            const jobId = response.data.task_id;
             return {success: true, jobId};
         } catch (error) {
             console.error('Failed to start training:', error);
@@ -118,21 +113,18 @@ export class BeamModelClient {
             const base64Image = Buffer.from(imageData).toString('base64');
 
             const payload = {
-                input: {
-                    extension: extension.toLowerCase().replace(/^\./, ''), // Remove leading dot if present
-                    user_id: userId,
-                    data: base64Image
-                }
+                extension: extension.toLowerCase().replace(/^\./, ''), // Remove leading dot if present
+                user_id: userId,
+                image_data: base64Image,
+                action: 'store',
             };
 
             console.log(`Uploading image (${imageData.length} bytes) for user ${userId} to RunPod`);
 
             const response = await this.axiosInstance.post(config.modelClient.beam.fileUrl!, payload);
 
-            return {
-                success: true,
-                data: response.data
-            };
+            const jobId = response.data.task_id;
+            return this.pollJobStatus(jobId);
         } catch (error) {
             console.error('Failed to upload image to RunPod:', error);
             return {
@@ -151,22 +143,18 @@ export class BeamModelClient {
 
         try {
             const payload = {
-                input: {
-                    action: 'clear',
-                    extension: '', // Remove leading dot if present
-                    user_id: userId,
-                    data: '',
-                }
+                action: 'clear',
+                extension: '', // Remove leading dot if present
+                user_id: userId,
+                data: '',
             };
 
             console.log(`Clearing data for user ${userId} to RunPod`);
 
             const response = await this.axiosInstance.post(config.modelClient.beam.fileUrl!, payload);
 
-            return {
-                success: true,
-                data: response.data
-            };
+            const jobId = response.data.task_id;
+            return this.pollJobStatus(jobId);
         } catch (error) {
             console.error('Failed to upload image to RunPod:', error);
             return {
@@ -256,7 +244,7 @@ export class BeamModelClient {
 
             return {
                 success: true,
-                jobId: response.data.id,
+                jobId: response.data.task_id,
             };
 
         } catch (error) {
@@ -268,19 +256,24 @@ export class BeamModelClient {
         }
     }
 
-    private async pollJobStatus(jobId: string): Promise<{ success: boolean; pending?: boolean; error?: string; outputs?: any }> {
+    private async pollJobStatus(jobId: string): Promise<{
+        success: boolean;
+        pending?: boolean;
+        error?: string;
+        outputs?: any
+    }> {
         try {
             const response = await this.axiosInstance.get<JobStatusResponse>(`${config.modelClient.beam.jobUrl}/${jobId}`);
 
             const status = response.data.status;
 
-            if (status === 'FAILED' || status === 'CANCELED') {
+            if (status === 'ERROR' || status === 'CANCELED') {
                 throw new Error(`Job ${jobId} failed with status ${status}`);
             }
 
             return {
                 success: true,
-                pending: status !== 'COMPLETED',
+                pending: status !== 'COMPLETE',
                 outputs: response.data.outputs,
             };
         } catch (error: any) {
