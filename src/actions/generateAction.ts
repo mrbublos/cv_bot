@@ -1,8 +1,8 @@
 import {Action, ActionContext} from './baseAction';
-import {RunpodModelClient} from "../modelClients/runpodModelClient";
+import {getModelClient} from "../modelClients/modelClient";
 
 export class GenerateAction extends Action {
-    private modelClient = new RunpodModelClient();
+    private modelClient = getModelClient();
 
     public async execute(context: ActionContext): Promise<void> {
         const { bot, msg, user } = context;

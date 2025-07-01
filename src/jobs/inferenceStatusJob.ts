@@ -1,7 +1,6 @@
 import {JobData, JobHandler} from './types';
-import { RunpodModelClient } from '../modelClients/runpodModelClient';
-import {Database} from "../db/database";
 import TelegramBot from "node-telegram-bot-api";
+import {getModelClient} from "../modelClients/modelClient";
 
 interface InferenceStatusJobPayload {
   jobId: string;
@@ -9,10 +8,10 @@ interface InferenceStatusJobPayload {
   chatId: string;
 }
 
-export class RunpodInferenceStatusJob implements JobHandler<InferenceStatusJobPayload> {
+export class InferenceStatusJob implements JobHandler<InferenceStatusJobPayload> {
   private readonly MAX_ATTEMPTS = 200;
   private readonly POLL_INTERVAL_MS = 30000;
-  private readonly modelClient = new RunpodModelClient();
+  private readonly modelClient = getModelClient();
   private readonly bot: TelegramBot;
 
   constructor(bot: TelegramBot) {

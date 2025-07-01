@@ -1,11 +1,11 @@
 import {Action, ActionContext} from './baseAction';
 import {s3Client} from '../s3/s3';
 import {v4 as uuidv4} from 'uuid';
-import {RunpodModelClient} from "../modelClients/runpodModelClient";
+import {getModelClient} from "../modelClients/modelClient";
 
 export class ImageUploadAction extends Action {
     private readonly REQUIRED_IMAGES = 10;
-    private modelClient = new RunpodModelClient();
+    private modelClient = getModelClient();
 
     private async startTraining(chatId: string, userId: string) {
         try {

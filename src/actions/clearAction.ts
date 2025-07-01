@@ -1,10 +1,10 @@
-import { Action, ActionContext } from './baseAction';
-import { s3Client } from '../s3/s3';
-import {RunpodModelClient} from "../modelClients/runpodModelClient";
+import {Action, ActionContext} from './baseAction';
+import {s3Client} from '../s3/s3';
+import {getModelClient} from "../modelClients/modelClient";
 
 export class ClearAction extends Action {
 
-  private readonly modelClient = new RunpodModelClient();
+  private readonly modelClient = getModelClient();
 
   async execute(context: ActionContext): Promise<void> {
     const { msg, user } = context;

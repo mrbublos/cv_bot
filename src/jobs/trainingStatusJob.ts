@@ -1,7 +1,7 @@
 import {JobData, JobHandler} from './types';
 import {Database} from "../db/database";
-import {RunpodModelClient} from "../modelClients/runpodModelClient";
 import TelegramBot from "node-telegram-bot-api";
+import {getModelClient} from "../modelClients/modelClient";
 
 interface TrainingStatusJobPayload {
   userId: string;
@@ -9,10 +9,10 @@ interface TrainingStatusJobPayload {
   jobId: string;
 }
 
-export class RunpodTrainingStatusJob implements JobHandler<TrainingStatusJobPayload> {
+export class TrainingStatusJob implements JobHandler<TrainingStatusJobPayload> {
   private readonly MAX_ATTEMPTS = 200;
   private readonly POLL_INTERVAL_MS = 30000;
-  private readonly modelClient = new RunpodModelClient();
+  private readonly modelClient = getModelClient();
   private readonly db: Database;
   private readonly bot: TelegramBot;
 
