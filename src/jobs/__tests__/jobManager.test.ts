@@ -1,6 +1,6 @@
 import { mock, MockProxy } from 'jest-mock-extended';
 import { DatabaseClient } from '../../db/DatabaseClient';
-import { JobRepository } from '../../repositories/JobRepository';
+import { JobRepository } from '../../repositories';
 import { JobData, JobHandler } from '../types';
 import {JobManager, JobType} from "../jobManager";
 
