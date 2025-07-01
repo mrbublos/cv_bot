@@ -297,9 +297,27 @@ export class BeamModelClient {
     public async getInferenceStatus(jobId: string): Promise<Buffer<ArrayBuffer> | undefined> {
         const result = await this.pollJobStatus(jobId);
         if (result.success && !result.pending && result.outputs && result.outputs.length > 0) {
-            return Buffer.from(result.outputs[0].image, 'base64');
+            return downloadFileToMemory(result.outputs[0].url);
         }
         return undefined;
+    }
+}
+
+async function downloadFileToMemory(url: string): Promise<Buffer> {
+    try {
+        const response = await axios({
+            url: url,
+            method: 'GET',
+            responseType: 'arraybuffer', // Fetch as a binary buffer
+        });
+
+        // The file data is now in memory as a Buffer
+        const fileBuffer = Buffer.from(response.data);
+        console.log('File downloaded to memory, size:', fileBuffer.length, 'bytes');
+        return fileBuffer;
+    } catch (error) {
+        console.error('Error downloading file:', error);
+        throw error;
     }
 }
 
