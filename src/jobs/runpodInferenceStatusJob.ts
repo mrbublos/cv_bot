@@ -1,5 +1,5 @@
 import {JobData, JobHandler} from './types';
-import { RunpodModelClient } from '../runpodModelClient';
+import { RunpodModelClient } from '../modelClients/runpodModelClient';
 import {Database} from "../db/database";
 import TelegramBot from "node-telegram-bot-api";
 

@@ -1,7 +1,7 @@
 import {Action, ActionContext} from './baseAction';
 import {s3Client} from '../s3/s3';
 import {v4 as uuidv4} from 'uuid';
-import {RunpodModelClient} from "../runpodModelClient";
+import {RunpodModelClient} from "../modelClients/runpodModelClient";
 
 export class ImageUploadAction extends Action {
     private readonly REQUIRED_IMAGES = 10;

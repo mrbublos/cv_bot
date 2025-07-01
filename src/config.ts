@@ -27,5 +27,12 @@ export const config = {
             apiKey: process.env.RUNPOD_API_KEY,
             baseUrl: process.env.RUNPOD_URL,
         },
+        beam: {
+            apiKey: process.env.BEAM_API_KEY,
+            jobUrl: process.env.BEAM_JOB_URL,
+            fileUrl: process.env.BEAM_UPLOAD_URL,
+            trainUrl: process.env.BEAM_TRAIN_URL,
+            inferenceUrl: process.env.BEAM_INFERENCE_URL,
+        },
     },
 };

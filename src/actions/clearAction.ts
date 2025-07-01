@@ -1,6 +1,6 @@
 import { Action, ActionContext } from './baseAction';
 import { s3Client } from '../s3/s3';
-import {RunpodModelClient} from "../runpodModelClient";
+import {RunpodModelClient} from "../modelClients/runpodModelClient";
 
 export class ClearAction extends Action {
 

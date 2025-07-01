@@ -1,6 +1,6 @@
 import {JobData, JobHandler} from './types';
 import {Database} from "../db/database";
-import {RunpodModelClient} from "../runpodModelClient";
+import {RunpodModelClient} from "../modelClients/runpodModelClient";
 import TelegramBot from "node-telegram-bot-api";
 
 interface TrainingStatusJobPayload {

@@ -1,5 +1,5 @@
 import {Action, ActionContext} from './baseAction';
-import {RunpodModelClient} from "../runpodModelClient";
+import {RunpodModelClient} from "../modelClients/runpodModelClient";
 
 export class GenerateAction extends Action {
     private modelClient = new RunpodModelClient();
