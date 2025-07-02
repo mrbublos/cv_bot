@@ -11,6 +11,9 @@ export const config = {
     telegram: {
         token: process.env.TELEGRAM_BOT_TOKEN,
     },
+    db: {
+        path: process.env.DB_PATH,
+    },
     s3: {
         enabled: process.env.S3_ENABLED === 'true',
         accessKeyId: process.env.S3_ACCESS_KEY,

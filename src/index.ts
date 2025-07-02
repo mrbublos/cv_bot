@@ -10,7 +10,7 @@ if (!config.telegram.token) {
 }
 
 const bot = new TelegramBot(config.telegram.token, { polling: true });
-const db = new Database('bot.db');
+const db = new Database(config.db.path!);
 const jobManager = initializeJobSystem(db, bot);
 const actionRouter = new ActionRouter(db, jobManager, bot);
 
