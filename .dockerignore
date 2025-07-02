@@ -1,0 +1,12 @@
+node_modules
+npm-debug.log
+Dockerfile*
+.dockerignore
+.git
+.gitignore
+.idea
+dist
+bot.db
+.env
+.env.local
+memory-bank
