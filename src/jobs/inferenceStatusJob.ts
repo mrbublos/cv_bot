@@ -46,7 +46,7 @@ export class InferenceStatusJob implements JobHandler<InferenceStatusJobPayload>
   }
 
   async onSuccess(result: any, job: JobData<InferenceStatusJobPayload>): Promise<void> {
-    console.log(`InferenceStatusJob completed for job ${job.id}`, result);
+    console.log(`InferenceStatusJob completed for job ${job.id}`);
     this.bot.sendPhoto(job.payload.chatId, result.image);
   }
 

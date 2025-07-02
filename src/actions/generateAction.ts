@@ -8,12 +8,7 @@ export class GenerateAction extends Action {
         const { bot, msg, user } = context;
         const chatId = msg.chat.id.toString();
         const userId = user.id.toString();
-        const text = msg.text?.replace('/generate', '').trim();
-
-        if (!text) {
-            await bot.sendMessage(chatId, 'Please provide some text after the /generate command. Example: /generate a sunset over mountains');
-            return;
-        }
+        const text = msg.text?.trim();
 
         try {
             // Check if user has a trained model
@@ -39,6 +34,7 @@ export class GenerateAction extends Action {
             });
 
             if (result.success) {
+                this.bot.sendMessage(chatId, '⏳ Generating image...');
                 this.jobManager.createJob('generate-image', { userId, chatId, jobId: result.jobId });
             } else {
                 throw new Error(result.error || 'Failed to generate image');

@@ -229,18 +229,18 @@ export class BeamModelClient {
     public async infer(options: InferenceOptions): Promise<InferenceResponse> {
         try {
             const payload = {
-                input: {
-                    user_id: options.userId,
-                    prompt: options.inputData.prompt,
-                    width: options.inputData.width,
-                    height: options.inputData.height,
-                    num_steps: 4,
-                    lora_styles: options.inputData.loraStyles,
-                    lora_personal: options.inputData.loraPersonal,
-                }
+                user_id: options.userId,
+                prompt: options.inputData.prompt,
+                width: options.inputData.width,
+                height: options.inputData.height,
+                num_steps: 4,
+                lora_styles: options.inputData.loraStyles,
+                lora_personal: options.inputData.loraPersonal,
             };
 
             const response = await this.axiosInstance.post(config.modelClient.beam.inferenceUrl!, payload);
+
+            console.log(`Inference response ${options.userId}:`, response.data);
 
             return {
                 success: true,

@@ -6,6 +6,7 @@ import {HelpAction} from './actions/helpAction';
 import {ImageUploadAction} from './actions/imageUploadAction';
 import {ClearAction} from './actions/clearAction';
 import {JobManager} from "./jobs/jobManager";
+import {GenerateAction} from "./actions/generateAction";
 
 type ActionClass = new (db: Database, jobManager: JobManager, bot: TelegramBot) => Action;
 
@@ -50,6 +51,7 @@ export class ActionRouter {
       return new actionClass(this.db, this.jobManager, this.bot);
     }
 
-    return null;
+
+    return new GenerateAction(this.db, this.jobManager, this.bot);
   }
 }
