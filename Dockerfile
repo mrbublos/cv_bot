@@ -6,14 +6,13 @@ WORKDIR /usr/src/app
 # Copy package.json, package-lock.json and tsconfig.json
 COPY package*.json ./
 COPY tsconfig.json ./
+COPY .env ./
 
 # Install all dependencies
 RUN npm install
 
 # Copy the rest of the application source code
 COPY . .
-
-RUN ls
 
 # Compile TypeScript to JavaScript
 RUN npm run build
@@ -24,7 +23,7 @@ FROM node:22-alpine
 WORKDIR /usr/src/app
 
 # Copy package.json and package-lock.json
-COPY package*.json ./
+COPY package*.json .env ./
 
 # Install only production dependencies
 RUN npm install --omit=dev
