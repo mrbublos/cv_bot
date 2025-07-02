@@ -7,6 +7,5 @@ Dockerfile*
 .idea
 dist
 bot.db
-.env
 .env.local
 memory-bank
