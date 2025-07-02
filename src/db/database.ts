@@ -106,7 +106,6 @@ export class Database implements DatabaseClient {
 
   async getTrainingStatus(userId: string): Promise<{
     status: string;
-    model_id?: string;
     job_id?: string;
     training_parameters?: any;
     started_at?: string;
@@ -115,13 +114,12 @@ export class Database implements DatabaseClient {
     await this.ensureConnected();
     const result = await this.db.get<{
       status: string;
-      model_id?: string;
       job_id?: string;
       training_parameters?: string;
       started_at?: string;
       completed_at?: string;
     }>(
-      'SELECT status, model_id, job_id, training_parameters, started_at, completed_at FROM training_status WHERE user_id = ?',
+      'SELECT status, job_id, training_parameters, started_at, completed_at FROM training_status WHERE user_id = ?',
       userId
     );
 
@@ -131,7 +129,6 @@ export class Database implements DatabaseClient {
 
     return {
       status: result.status,
-      model_id: result.model_id,
       job_id: result.job_id,
       training_parameters: result.training_parameters ? JSON.parse(result.training_parameters) : undefined,
       started_at: result.started_at,
@@ -144,8 +141,8 @@ export class Database implements DatabaseClient {
     const paramsJson = JSON.stringify(params);
     await this.db.run(
       `INSERT INTO training_status
-       (user_id, status, started_at, model_id, completed_at, training_parameters) 
-       VALUES (?, ?, CURRENT_TIMESTAMP, NULL, NULL, ?)`,
+       (user_id, status, started_at, completed_at, training_parameters) 
+       VALUES (?, ?, CURRENT_TIMESTAMP, NULL, ?)`,
       userId,
       'in_progress',
       paramsJson
@@ -204,7 +201,6 @@ export class Database implements DatabaseClient {
        SET status = 'not_started', 
            started_at = NULL, 
            completed_at = NULL, 
-           model_id = NULL,
            job_id = NULL 
        WHERE user_id = ?`,
       userId
