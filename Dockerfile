@@ -6,13 +6,14 @@ WORKDIR /usr/src/app
 # Copy package.json, package-lock.json and tsconfig.json
 COPY package*.json ./
 COPY tsconfig.json ./
-COPY .env ./
 
 # Install all dependencies
 RUN npm install
 
 # Copy the rest of the application source code
 COPY . .
+
+RUN ls
 
 # Compile TypeScript to JavaScript
 RUN npm run build
