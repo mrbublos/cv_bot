@@ -3,6 +3,8 @@ import {s3Client} from '../s3/s3';
 import {v4 as uuidv4} from 'uuid';
 import {getModelClient} from "../modelClients/modelClient";
 
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 export class ImageUploadAction extends Action {
     private readonly REQUIRED_IMAGES = 10;
     private modelClient = getModelClient();
@@ -92,6 +94,8 @@ export class ImageUploadAction extends Action {
                     // Check if we've reached the required number of images
                     if (imageCount >= this.REQUIRED_IMAGES) {
                         bot.sendMessage(chatId, `🎯 You've uploaded ${this.REQUIRED_IMAGES} images! Starting model training...`);
+                        // volumes sync in beam take up to 60 seconds
+                        await sleep(60000);
                         await this.startTraining(chatId, userId);
                     }
                 } catch (error) {
