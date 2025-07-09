@@ -79,7 +79,7 @@ export class BeamModelClient {
 
             const payload = {
                 user_id: options.userId,
-                steps: 500,
+                steps: config.modelClient.training.numSteps,
             };
 
             const response = await this.axiosInstance.post(config.modelClient.beam.trainUrl!, payload);
@@ -233,7 +233,7 @@ export class BeamModelClient {
                 prompt: options.inputData.prompt,
                 width: options.inputData.width,
                 height: options.inputData.height,
-                num_steps: 4,
+                num_steps: config.modelClient.inference.numSteps,
                 lora_styles: options.inputData.loraStyles,
                 lora_personal: options.inputData.loraPersonal,
             };

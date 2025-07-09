@@ -23,6 +23,12 @@ export const config = {
         endpoint: process.env.S3_ENDPOINT,
     },
     modelClient: {
+        inference: {
+            numSteps: process.env.INFERENCE_NUM_STEPS,
+        },
+        training: {
+            numSteps: process.env.TRAINING_NUM_STEPS,
+        },
         runpod: {
             fileSavePodId: process.env.RUNPOD_SAVE_FILE_POD,
             trainPodId: process.env.RUNPOD_TRAIN_POD,
