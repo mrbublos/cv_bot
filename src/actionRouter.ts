@@ -6,6 +6,7 @@ import {HelpAction} from './actions/helpAction';
 import {ImageUploadAction} from './actions/imageUploadAction';
 import {ClearAction} from './actions/clearAction';
 import {SetDbAction} from './actions/setDbAction';
+import {GetDbAction} from './actions/getDbAction';
 import {JobManager} from "./jobs/jobManager";
 import {GenerateAction} from "./actions/generateAction";
 
@@ -26,6 +27,7 @@ export class ActionRouter {
       '/help': HelpAction,
       '/clear': ClearAction,
       '/setdb': SetDbAction,
+      '/getdb': GetDbAction,
     };
   }
 
