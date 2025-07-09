@@ -35,16 +35,11 @@ export class SetDbAction extends Action {
       if (!response.ok) throw new Error('Failed to download the file');
       
       const fileBuffer = await response.arrayBuffer();
-      const currentDbPath = path.join(process.cwd(), config.db.path!);
-      const backupPath = path.join(process.cwd(), `bot_backup_${Date.now()}.db`);
-      
-      // Backup the current database if it exists
-      if (fs.existsSync(currentDbPath)) {
-        fs.copyFileSync(currentDbPath, backupPath);
-      }
-      
+      const currentDbPath = config.db.path!;
+
       // Save the new database file
       fs.writeFileSync(currentDbPath, Buffer.from(fileBuffer));
+      await this.db.reconnect();
       
       await this.bot.sendMessage(
         msg.chat.id,

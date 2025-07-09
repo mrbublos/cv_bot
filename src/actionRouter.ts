@@ -37,24 +37,18 @@ export class ActionRouter {
 
     let actionClass: ActionClass | undefined;
 
-    if (msg.photo) {
-      return new ImageUploadAction(this.db, this.jobManager, this.bot);
-    }
-
     // First, check for commands
     if (text.startsWith('/')) {
-      actionClass = this.actions[text];
+      actionClass = this.actions[text.trim()];
     }
 
-    // If no command, check state-based actions (not implemented yet)
-    // if (!actionClass) {
-    //   // TODO: Add state-based routing
-    // }
+    if (!actionClass && msg.photo) {
+      return new ImageUploadAction(this.db, this.jobManager, this.bot);
+    }
 
     if (actionClass) {
       return new actionClass(this.db, this.jobManager, this.bot);
     }
-
 
     return new GenerateAction(this.db, this.jobManager, this.bot);
   }

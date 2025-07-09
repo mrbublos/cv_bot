@@ -6,7 +6,7 @@ import { config } from "../config";
 export class GetDbAction extends Action {
   async execute(context: ActionContext): Promise<void> {
     const { bot, msg } = context;
-    const currentDbPath = path.join(process.cwd(), config.db.path!);
+    const currentDbPath = config.db.path!;
 
     // Check if the database file exists
     if (!fs.existsSync(currentDbPath)) {

@@ -12,8 +12,13 @@ export interface User {
 export class Database implements DatabaseClient {
   private db!: SqliteDatabase;
 
-  constructor(dbPath: string) {
+  constructor(private readonly dbPath: string) {
     this.connect(dbPath);
+  }
+
+  public async reconnect() {
+    await this.db.close();
+    await this.connect(this.dbPath);
   }
 
   public async ensureConnected() {
