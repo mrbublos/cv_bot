@@ -10,3 +10,4 @@ bot.db
 memory-bank
 jobs
 jest.config.js
+buildpush.sh
