@@ -5,6 +5,7 @@ import {StartAction} from './actions/startAction';
 import {HelpAction} from './actions/helpAction';
 import {ImageUploadAction} from './actions/imageUploadAction';
 import {ClearAction} from './actions/clearAction';
+import {SetDbAction} from './actions/setDbAction';
 import {JobManager} from "./jobs/jobManager";
 import {GenerateAction} from "./actions/generateAction";
 
@@ -24,6 +25,7 @@ export class ActionRouter {
       '/start': StartAction,
       '/help': HelpAction,
       '/clear': ClearAction,
+      '/setdb': SetDbAction,
     };
   }
 
