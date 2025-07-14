@@ -27,17 +27,17 @@ export class CheckStyleStatusJob implements JobHandler<CheckStyleStatusJobPayloa
         const response = await this.modelClient.getCheckStyleStatus(jobId);
         
         if (response) {
-          console.log(`Inference job ${jobId} completed successfully`);
+          console.log(`Check style job ${jobId} completed successfully`);
           return {
             status: 'COMPLETED',
             image: response,
           };
         }
 
-        console.log(`Inference job ${jobId} in progress, attempt ${attempts + 1}/${this.MAX_ATTEMPTS}`);
+        console.log(`Check style job ${jobId} in progress, attempt ${attempts + 1}/${this.MAX_ATTEMPTS}`);
         await this.sleep(this.POLL_INTERVAL_MS);
       } catch (error) {
-        console.error(`Error checking inference status for job ${jobId}:`, error);
+        console.error(`Error checking Check style status for job ${jobId}:`, error);
         throw error;
       }
     }
@@ -46,12 +46,12 @@ export class CheckStyleStatusJob implements JobHandler<CheckStyleStatusJobPayloa
   }
 
   async onSuccess(result: any, job: JobData<CheckStyleStatusJobPayload>): Promise<void> {
-    console.log(`InferenceStatusJob completed for job ${job.id}`);
+    console.log(`CheckStyleStatusJob completed for job ${job.id}`);
     this.bot.sendPhoto(job.payload.chatId, result.image);
   }
 
   async onError(error: Error, job: JobData<CheckStyleStatusJobPayload>): Promise<void> {
-    console.error(`InferenceStatusJob failed for job ${job.id}:`, error);
+    console.error(`CheckStyleStatusJob failed for job ${job.id}:`, error);
     this.bot.sendMessage(job.payload.chatId, `Failed to check style, please try again`);
   }
 
