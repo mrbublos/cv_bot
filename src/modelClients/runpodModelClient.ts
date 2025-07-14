@@ -339,11 +339,11 @@ export class RunpodModelClient {
                 throw new Error(response.data.error || `Job ${status.toLowerCase()}`);
             }
 
-            if (status === 'PENDING') {
-                return undefined;
+            if (status === 'COMPLETED') {
+                return Buffer.from(response.data.output.result, 'base64');
             }
 
-            return Buffer.from(response.data.output.result, 'base64');
+            return undefined;
         } catch (error) {
             console.error(`Failed to get training status for job ${jobId}:`, error);
             throw error;
@@ -360,11 +360,11 @@ export class RunpodModelClient {
                 throw new Error(response.data.error || `Job ${status.toLowerCase()}`);
             }
 
-            if (status === 'PENDING') {
-                return undefined;
+            if (status === 'COMPLETED') {
+                return Buffer.from(response.data.output.result, 'base64');
             }
 
-            return Buffer.from(response.data.output.output.image, 'base64');
+            return undefined;
         } catch (error) {
             console.error(`Failed to get training status for job ${jobId}:`, error);
             throw error;
