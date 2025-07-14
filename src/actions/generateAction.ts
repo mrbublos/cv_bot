@@ -26,8 +26,8 @@ export class GenerateAction extends Action {
                 userId,
                 inputData: {
                     prompt: text,
-                    width: 512,  // Default width
-                    height: 512, // Default height
+                    width: 1024,  // Default width
+                    height: 1024, // Default height
                     loraStyles: [], // Empty array as stub
                     loraPersonal: true // Default to personal LoRA
                 },

@@ -1,5 +1,8 @@
 import axios, {AxiosInstance} from 'axios';
 import {config} from "../config";
+import crypto from "crypto";
+import path from "path";
+import fs from "fs";
 
 interface TrainingOptions {
     modelName: string;
@@ -53,6 +56,9 @@ export class BeamModelClient {
         });
     }
 
+    private async checkStyle(prompt: string, link: string): Promise<{ success: boolean; jobId?: string; error?: string}> {
+        throw new Error('Method not implemented.');
+    }
 
     public async train(options: TrainingOptions): Promise<{
         success: boolean;

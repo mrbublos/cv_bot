@@ -1,5 +1,8 @@
 import axios, {AxiosInstance} from 'axios';
 import {config} from "../config";
+import crypto from "crypto";
+import path from "path";
+import fs from "fs";
 
 interface TrainingOptions {
     modelName: string;
@@ -42,6 +45,7 @@ interface ImageUploadResponse {
 
 export class RunpodModelClient {
     private axiosInstance: AxiosInstance;
+    private checkStylePodId = config.modelClient.runpod.checkStylePodId;
     private trainingPodId = config.modelClient.runpod.trainPodId;
     private inferencePodId = config.modelClient.runpod.inferencePodId
     private collectPodId = config.modelClient.runpod.fileSavePodId;
@@ -58,6 +62,31 @@ export class RunpodModelClient {
         });
     }
 
+
+    async checkStyle(prompt: string, link: string): Promise<{
+        success: boolean;
+        jobId?: string;
+        error?: string
+    }> {
+        try {
+            const response = await this.axiosInstance.post(`/${this.checkStylePodId}/run`, {
+                input: {
+                    prompt: prompt,
+                    user_id: "test_arina",
+                    num_steps: 40,
+                    style_link: link
+                }
+            });
+            const jobId = response.data.id;
+            return {success: true, jobId};
+        } catch (error) {
+            console.error('Failed to start training:', error);
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Failed to start training'
+            };
+        }
+    }
 
     public async train(options: TrainingOptions): Promise<{
         success: boolean;
@@ -146,6 +175,7 @@ export class RunpodModelClient {
             };
         }
     }
+
     public async deleteUserData(
         userId: string,
     ): Promise<{ success: boolean; data?: any; error?: string }> {
@@ -296,6 +326,27 @@ export class RunpodModelClient {
                 success: false,
                 error: error instanceof Error ? error.message : 'Failed to get training status'
             };
+        }
+    }
+
+    async getCheckStyleStatus(jobId: string): Promise<Buffer<ArrayBuffer> | undefined> {
+        try {
+            const response = await this.axiosInstance.get(`/${this.checkStylePodId}/status/${jobId}`);
+
+            const status = response.data.status;
+
+            if (status === 'FAILED' || status === 'CANCELED') {
+                throw new Error(response.data.error || `Job ${status.toLowerCase()}`);
+            }
+
+            if (status === 'PENDING') {
+                return undefined;
+            }
+
+            return Buffer.from(response.data.output.result, 'base64');
+        } catch (error) {
+            console.error(`Failed to get training status for job ${jobId}:`, error);
+            throw error;
         }
     }
 

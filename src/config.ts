@@ -31,10 +31,12 @@ export const config = {
         },
         runpod: {
             fileSavePodId: process.env.RUNPOD_SAVE_FILE_POD,
+            checkStylePodId: process.env.RUNPOD_CHECK_STYLE_POD,
             trainPodId: process.env.RUNPOD_TRAIN_POD,
             inferencePodId: process.env.RUNPOD_INFERENCE_POD,
             apiKey: process.env.RUNPOD_API_KEY,
             baseUrl: process.env.RUNPOD_URL,
+            stylePath: process.env.RUNPOD_STYLE_PATH,
         },
         beam: {
             apiKey: process.env.BEAM_API_KEY,
@@ -42,6 +44,7 @@ export const config = {
             fileUrl: process.env.BEAM_UPLOAD_URL,
             trainUrl: process.env.BEAM_TRAIN_URL,
             inferenceUrl: process.env.BEAM_INFERENCE_URL,
+            stylePath: process.env.BEAM_STYLE_PATH,
         },
     },
 };

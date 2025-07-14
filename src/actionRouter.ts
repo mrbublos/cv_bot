@@ -9,6 +9,7 @@ import {SetDbAction} from './actions/setDbAction';
 import {GetDbAction} from './actions/getDbAction';
 import {JobManager} from "./jobs/jobManager";
 import {GenerateAction} from "./actions/generateAction";
+import {StyleTestAction} from "./actions/styleTestAction";
 
 type ActionClass = new (db: Database, jobManager: JobManager, bot: TelegramBot) => Action;
 
@@ -28,6 +29,7 @@ export class ActionRouter {
       '/clear': ClearAction,
       '/setdb': SetDbAction,
       '/getdb': GetDbAction,
+      '/test_style': StyleTestAction,
     };
   }
 
@@ -39,7 +41,8 @@ export class ActionRouter {
 
     // First, check for commands
     if (text.startsWith('/')) {
-      actionClass = this.actions[text.trim()];
+      const command = text.split(' ')[0];
+      actionClass = this.actions[command];
     }
 
     if (!actionClass && msg.photo) {

@@ -2,7 +2,7 @@ import {Database} from '../db/database';
 import {JobData, JobHandler} from './types';
 import {JobRepository} from "../repositories";
 
-export type JobType = 'monitor-training-status' | 'generate-image';
+export type JobType = 'monitor-training-status' | 'generate-image' | 'check-style-status';
 
 export class JobManager {
   private handlers: Map<JobType, JobHandler> = new Map();
