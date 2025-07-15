@@ -35,7 +35,7 @@ export class StyleTestAction extends Action {
       }
 
       await this.jobManager.createJob('check-style-status', { userId, chatId, jobId: result.jobId });
-      await bot.sendMessage(chatId, `Creating matrix...`);
+      await bot.sendMessage(chatId, `Creating matrix... it can take a few minutes`);
     } catch (error) {
       console.error('Error checking style:', error);
       bot.sendMessage(chatId, 'Error checking style. Please try again.');
