@@ -77,8 +77,9 @@ export class RunpodModelClient {
                     num_steps: 40,
                     width: 1024,
                     height: 1024,
-                    min_scale: 0.2,
-                    max_scale: 1.0,
+                    min_scale: 0.4,
+                    max_scale: 1.1,
+                    scale_step: 0.1,
                     style_link: link
                 }
             });
