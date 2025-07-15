@@ -74,11 +74,11 @@ export class RunpodModelClient {
                 input: {
                     prompt: prompt,
                     user_id: "test_arina",
-                    num_steps: 40,
+                    num_steps: 50,
                     width: 1024,
                     height: 1024,
-                    min_scale: 0.4,
-                    max_scale: 1.1,
+                    min_scale: 0.6,
+                    max_scale: 1.3,
                     scale_step: 0.1,
                     style_link: link
                 }
