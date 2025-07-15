@@ -3,6 +3,7 @@ import {config} from "../config";
 import crypto from "crypto";
 import path from "path";
 import fs from "fs";
+import {s3Client} from "../s3/s3";
 
 interface TrainingOptions {
     modelName: string;
@@ -340,7 +341,11 @@ export class RunpodModelClient {
             }
 
             if (status === 'COMPLETED') {
-                return Buffer.from(response.data.output.result, 'base64');
+                let filename = response.data.output.filename;
+                console.log("Downloading file:", filename);
+                const content = await s3Client.load(filename);
+                await s3Client.delete(filename);
+                return content;
             }
 
             return undefined;
