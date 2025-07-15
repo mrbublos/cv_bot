@@ -21,6 +21,8 @@ class S3Client {
             accessKeyId: config.s3.accessKeyId,
             secretAccessKey: config.s3.secretAccessKey,
             region: config.s3.region,
+            endpoint: config.s3.endpoint,
+            s3ForcePathStyle: true,
         };
 
         if (config.s3.endpoint) {
