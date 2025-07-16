@@ -47,7 +47,7 @@ export class CheckStyleStatusJob implements JobHandler<CheckStyleStatusJobPayloa
 
   async onSuccess(result: any, job: JobData<CheckStyleStatusJobPayload>): Promise<void> {
     console.log(`CheckStyleStatusJob completed for job ${job.id}`);
-    this.bot.sendPhoto(job.payload.chatId, result.image);
+    this.bot.sendDocument(job.payload.chatId, result.image, {}, { filename: 'style_comparison.png', contentType: 'image/jpeg' });;
   }
 
   async onError(error: Error, job: JobData<CheckStyleStatusJobPayload>): Promise<void> {
