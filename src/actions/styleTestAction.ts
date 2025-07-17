@@ -1,9 +1,4 @@
-import { Action, ActionContext } from './baseAction';
-import axios from 'axios';
-import * as crypto from 'crypto';
-import * as fs from 'fs';
-import * as path from 'path';
-import {getModelClient} from "../modelClients/modelClient";
+import {Action, ActionContext} from './baseAction';
 import {RunpodModelClient} from "../modelClients/runpodModelClient";
 
 export class StyleTestAction extends Action {
@@ -35,10 +30,10 @@ export class StyleTestAction extends Action {
       }
 
       await this.jobManager.createJob('check-style-status', { userId, chatId, jobId: result.jobId });
-      await bot.sendMessage(chatId, `Creating matrix... it can take a few minutes`);
-    } catch (error) {
+      bot.sendMessage(chatId, `Creating matrix... it can take a few minutes (${result.jobId})`);
+    } catch (error: any) {
       console.error('Error checking style:', error);
-      bot.sendMessage(chatId, 'Error checking style. Please try again.');
+      bot.sendMessage(chatId, `Error checking style (${error?.message}). Please try again.`);
     }
   }
 }

@@ -84,6 +84,7 @@ export class RunpodModelClient {
                 }
             });
             const jobId = response.data.id;
+            console.log(`check style job started. Job ID: ${jobId}`);
             return {success: true, jobId};
         } catch (error) {
             console.error('Failed to start training:', error);
