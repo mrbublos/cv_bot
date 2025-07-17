@@ -354,6 +354,7 @@ export class RunpodModelClient {
                 return content;
             }
 
+            console.log(`Status of job${jobId}:`, status);
             return undefined;
         } catch (error) {
             console.error(`Failed to get training status for job ${jobId}:`, (error as any)?.message);
