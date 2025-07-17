@@ -1,8 +1,5 @@
 import axios, {AxiosInstance} from 'axios';
 import {config} from "../config";
-import crypto from "crypto";
-import path from "path";
-import fs from "fs";
 import {s3Client} from "../s3/s3";
 
 interface TrainingOptions {
