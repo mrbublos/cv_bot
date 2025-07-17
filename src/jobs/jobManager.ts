@@ -75,7 +75,7 @@ export class JobManager {
     }
   }
 
-  startProcessing(intervalMs: number = 5000) {
+  startProcessing(intervalMs: number = 100) {
     if (this.processingInterval) {
       clearInterval(this.processingInterval);
     }
