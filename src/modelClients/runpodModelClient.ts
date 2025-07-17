@@ -130,6 +130,7 @@ export class RunpodModelClient {
 
             const response = await this.axiosInstance.post(`/${this.trainingPodId}/run`, payload);
 
+            console.log(`Training job started. Job ID: ${response.data.id}`);
             const jobId = response.data.id;
             return {success: true, jobId};
         } catch (error) {
@@ -323,6 +324,7 @@ export class RunpodModelClient {
                 };
             }
 
+            console.log(`Status of training job ${jobId}:`, status);
             return {
                 success: true,
                 pending: status !== 'COMPLETED',
@@ -367,6 +369,8 @@ export class RunpodModelClient {
             const response = await this.axiosInstance.get(`/${this.inferencePodId}/status/${jobId}`);
 
             const status = response.data.status;
+
+            console.log(`Status of inference job ${jobId}:`, status);
 
             if (status === 'FAILED' || status === 'CANCELED') {
                 throw new Error(response.data.error || `Job ${status.toLowerCase()}`);
