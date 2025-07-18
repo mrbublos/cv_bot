@@ -35,6 +35,10 @@ export class TrainingStatusJob implements JobHandler<TrainingStatusJobPayload> {
           return;
         }
 
+        if (!response.success) {
+          throw new Error(response.error);
+        }
+
         console.log(`Training job ${jobId}, attempt ${attempts + 1}/${this.MAX_ATTEMPTS}`);
         await this.sleep(this.POLL_INTERVAL_MS);
         attempts++;
