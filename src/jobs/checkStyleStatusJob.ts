@@ -22,6 +22,8 @@ export class CheckStyleStatusJob implements JobHandler<CheckStyleStatusJobPayloa
     const { jobId } = payload;
     let attempts = 0;
 
+    await this.sleep(10000);
+
     while (attempts++ < this.MAX_ATTEMPTS) {
       try {
         const response = await this.modelClient.getCheckStyleStatus(jobId);
