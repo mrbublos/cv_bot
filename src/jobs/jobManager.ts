@@ -8,6 +8,8 @@ export class JobManager {
   private handlers: Map<JobType, JobHandler> = new Map();
   private isProcessing = false;
   private processingInterval: NodeJS.Timeout | null = null;
+  private activeJobs: Map<number, Promise<void>> = new Map();
+  private maxConcurrentJobs: number = 10;
 
   constructor(
     private readonly db: Database,
@@ -20,7 +22,7 @@ export class JobManager {
 
   async createJob<T = any>(type: JobType, payload?: T): Promise<number | undefined> {
     const jobId = await this.db.createJob(type, payload);
-    this.processJobs(); // Trigger processing if not already running
+    await this.processJobs(); // Trigger processing if not already running
     return jobId;
   }
 
@@ -33,50 +35,65 @@ export class JobManager {
     this.isProcessing = true;
 
     try {
-      let job = await this.jobRepository.getNextPendingJob();
-      
-      while (job) {
+      // Process jobs while we have capacity
+      while (this.activeJobs.size < this.maxConcurrentJobs) {
+        const job = await this.jobRepository.getNextPendingJob();
+        if (!job) break; // No more pending jobs
+        
         const handler = this.handlers.get(job.type);
         
         if (!handler) {
           await this.jobRepository.updateJobStatus(job.id, 'failed', null, `No handler found for job type: ${job.type}`);
-          job = await this.jobRepository.getNextPendingJob();
           continue;
         }
 
-        // Mark job as running
-        await this.jobRepository.updateJobStatus(job.id, 'running');
+        // Process the job asynchronously
+        const jobPromise = this.processJob(job, handler).catch((err) => {
+          console.error(`Error processing job ${job.id}: ${err}`);
+        });
+        this.activeJobs.set(job.id, jobPromise);
 
-        try {
-          // Execute the job
-          const result = await handler.handle(job.payload);
-          
-          // Mark job as completed
-          await this.jobRepository.updateJobStatus(job.id, 'completed', result);
-          
-          // Call success handler if defined
-          if (handler.onSuccess) {
-            await handler.onSuccess(result, job as JobData);
-          }
-        } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : String(error);
-          await this.jobRepository.updateJobStatus(job.id, 'failed', null, errorMessage);
-          
-          // Call error handler if defined
-          if (handler.onError) {
-            await handler.onError(error as Error, job as JobData);
-          }
-        }
-
-        // Get next pending job
-        job = await this.jobRepository.getNextPendingJob();
+        // When job completes, remove it from active jobs
+        jobPromise.finally(() => {
+          this.activeJobs.delete(job.id);
+          // Try to process more jobs if any are pending
+          this.processJobs().catch((err) => {
+            console.error(`Error processing jobs: ${err}`);
+          });
+        });
       }
     } finally {
       this.isProcessing = false;
     }
   }
 
-  startProcessing(intervalMs: number = 100) {
+  private async processJob(job: JobData, handler: JobHandler): Promise<void> {
+    try {
+      // Mark job as running
+      await this.jobRepository.updateJobStatus(job.id, 'running');
+
+      // Execute the job
+      const result = await handler.handle(job.payload);
+
+      // Mark job as completed
+      await this.jobRepository.updateJobStatus(job.id, 'completed', result);
+
+      // Call success handler if defined
+      if (handler.onSuccess) {
+        await handler.onSuccess(result, job);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      await this.jobRepository.updateJobStatus(job.id, 'failed', null, errorMessage);
+
+      // Call error handler if defined
+      if (handler.onError) {
+        await handler.onError(error as Error, job);
+      }
+    }
+  }
+
+  startProcessing(intervalMs: number = 1000) {
     if (this.processingInterval) {
       clearInterval(this.processingInterval);
     }
