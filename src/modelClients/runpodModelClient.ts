@@ -3,13 +3,10 @@ import {config} from "../config";
 import {s3Client} from "../s3/s3";
 
 interface TrainingOptions {
-    modelName: string;
+    modelName?: string;
     imageUrls?: string[];
     userId: string;
-    epochs?: number;
-    batchSize?: number;
-    learningRate?: number;
-    // Add other training-specific options as needed
+    steps?: number;
 }
 
 interface InferenceOptions {
@@ -118,10 +115,7 @@ export class RunpodModelClient {
             const payload = {
                 input: {
                     user_id: options.userId,
-                    model_name: options.modelName,
-                    epochs: options.epochs,
-                    batch_size: options.batchSize,
-                    learning_rate: options.learningRate
+                    steps: options.steps,
                 }
             };
 
@@ -313,6 +307,7 @@ export class RunpodModelClient {
             const response = await this.axiosInstance.get(`/${this.trainingPodId}/status/${jobId}`);
 
             const status = response.data.status;
+            console.log(`Status of training job ${jobId}:`, status);
 
             if (status === 'FAILED' || status === 'CANCELED') {
                 return {
@@ -321,7 +316,6 @@ export class RunpodModelClient {
                 };
             }
 
-            console.log(`Status of training job ${jobId}:`, status);
             return {
                 success: true,
                 pending: status !== 'COMPLETED',
@@ -340,6 +334,7 @@ export class RunpodModelClient {
             const response = await this.axiosInstance.get(`/${this.checkStylePodId}/status/${jobId}`);
 
             const status = response.data.status;
+            console.log(`Status of check style job${jobId}:`, status);
 
             if (status === 'FAILED' || status === 'CANCELED') {
                 throw new Error(response.data.error || `Job ${status.toLowerCase()}`);
@@ -353,7 +348,7 @@ export class RunpodModelClient {
                 return content;
             }
 
-            console.log(`Status of job${jobId}:`, status);
+
             return undefined;
         } catch (error) {
             console.error(`Failed to get training status for job ${jobId}:`, (error as any)?.message);
@@ -366,7 +361,6 @@ export class RunpodModelClient {
             const response = await this.axiosInstance.get(`/${this.inferencePodId}/status/${jobId}`);
 
             const status = response.data.status;
-
             console.log(`Status of inference job ${jobId}:`, status);
 
             if (status === 'FAILED' || status === 'CANCELED') {

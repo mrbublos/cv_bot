@@ -16,16 +16,12 @@ export class ImageUploadAction extends Action {
 
             // Define training parameters
             const trainingParams = {
-                modelName: `user-${userId}-model-${Date.now()}`,
                 datasetPath: images.map(img => img.image_url),
-                epochs: 10,
-                batchSize: 8,
-                learningRate: 0.001,
+                steps: 10,
                 startedAt: new Date().toISOString(),
                 userId,
             };
 
-            // Start training and get immediate response
             const trainResponse = await this.modelClient.train(trainingParams);
 
             if (!trainResponse.success) {
@@ -93,7 +89,7 @@ export class ImageUploadAction extends Action {
 
                     // Check if we've reached the required number of images
                     if (imageCount >= this.REQUIRED_IMAGES) {
-                        bot.sendMessage(chatId, `🎯 You've uploaded ${this.REQUIRED_IMAGES} images! Starting model training...`);
+                        bot.sendMessage(chatId, `🎯 You've uploaded ${this.REQUIRED_IMAGES} images! Starting model training (can take up to several minutes)...`);
                         // volumes sync in beam take up to 60 seconds
                         await sleep(60000);
                         await this.startTraining(chatId, userId);
