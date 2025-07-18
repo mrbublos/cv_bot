@@ -36,9 +36,9 @@ export class InferenceStatusJob implements JobHandler<InferenceStatusJobPayload>
 
         console.log(`Inference job ${jobId} in progress, attempt ${attempts + 1}/${this.MAX_ATTEMPTS}`);
         await this.sleep(this.POLL_INTERVAL_MS);
-      } catch (error) {
+      } catch (error: any) {
         console.error(`Error checking inference status for job ${jobId}:`, error);
-        throw error;
+        throw new Error(`Error checking inference status for job ${jobId}: ${error.message}`);
       }
     }
 

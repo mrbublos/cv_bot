@@ -8,6 +8,7 @@ export class JobManager {
   private handlers: Map<JobType, JobHandler> = new Map();
   private isProcessing = false;
   private processingInterval: NodeJS.Timeout | null = null;
+
   constructor(
     private readonly db: Database,
     private jobRepository: JobRepository = new JobRepository(db)
