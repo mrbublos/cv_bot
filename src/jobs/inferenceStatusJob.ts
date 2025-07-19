@@ -1,6 +1,7 @@
 import {JobData, JobHandler} from './types';
 import TelegramBot from "node-telegram-bot-api";
 import {getModelClient} from "../modelClients/modelClient";
+import {s3Client} from "../s3/s3";
 
 interface InferenceStatusJobPayload {
   jobId: string;
@@ -47,7 +48,9 @@ export class InferenceStatusJob implements JobHandler<InferenceStatusJobPayload>
 
   async onSuccess(result: any, job: JobData<InferenceStatusJobPayload>): Promise<void> {
     console.log(`InferenceStatusJob completed for job ${job.id}`);
-    this.bot.sendPhoto(job.payload.chatId, result.image);
+    const image = await s3Client.load(result.image);
+    this.bot.sendPhoto(job.payload.chatId, image);
+    s3Client.delete(result.image);
   }
 
   async onError(error: Error, job: JobData<InferenceStatusJobPayload>): Promise<void> {

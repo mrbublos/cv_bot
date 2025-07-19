@@ -279,7 +279,7 @@ export class RunpodModelClient {
                     prompt: options.inputData.prompt,
                     width: options.inputData.width,
                     height: options.inputData.height,
-                    num_steps: 4,
+                    num_steps: config.modelClient.inference.numSteps,
                     lora_styles: options.inputData.loraStyles,
                     lora_personal: options.inputData.loraPersonal,
                 }
@@ -356,7 +356,7 @@ export class RunpodModelClient {
         }
     }
 
-    public async getInferenceStatus(jobId: string): Promise<Buffer<ArrayBuffer> | undefined> {
+    public async getInferenceStatus(jobId: string): Promise<string | undefined> {
         try {
             const response = await this.axiosInstance.get(`/${this.inferencePodId}/status/${jobId}`);
 
@@ -368,7 +368,7 @@ export class RunpodModelClient {
             }
 
             if (status === 'COMPLETED') {
-                return Buffer.from(response.data.output.result, 'base64');
+                return response.data.output.filename;
             }
 
             return undefined;
