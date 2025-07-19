@@ -24,10 +24,10 @@ export const config = {
     },
     modelClient: {
         inference: {
-            numSteps: process.env.INFERENCE_NUM_STEPS,
+            numSteps: +(process.env.INFERENCE_NUM_STEPS ?? 50),
         },
         training: {
-            numSteps: process.env.TRAINING_NUM_STEPS,
+            numSteps: +(process.env.TRAINING_NUM_STEPS ?? 1000),
         },
         runpod: {
             fileSavePodId: process.env.RUNPOD_SAVE_FILE_POD,

@@ -2,6 +2,7 @@ import {Action, ActionContext} from './baseAction';
 import {s3Client} from '../s3/s3';
 import {v4 as uuidv4} from 'uuid';
 import {getModelClient} from "../modelClients/modelClient";
+import {config} from "../config";
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -17,7 +18,7 @@ export class ImageUploadAction extends Action {
             // Define training parameters
             const trainingParams = {
                 datasetPath: images.map(img => img.image_url),
-                steps: 10,
+                steps: config.modelClient.training.numSteps!,
                 startedAt: new Date().toISOString(),
                 userId,
             };
@@ -31,7 +32,7 @@ export class ImageUploadAction extends Action {
             await this.db.startTraining(userId, trainingParams);
 
             // Store the job ID for future reference
-            await this.jobManager.createJob("monitor-training-status", { userId, chatId, jobId: trainResponse.jobId });
+            await this.jobManager.createJob("monitor-training-status", {userId, chatId, jobId: trainResponse.jobId});
 
             // Notify user that training has started
             await this.bot.sendMessage(chatId, '⏳ Model training has started. You will be notified when it completes.');
@@ -68,7 +69,7 @@ export class ImageUploadAction extends Action {
             const fileName = `${uuidv4()}.${extension}`;
 
             const chunks: Buffer[] = [];
-            
+
             fileStream.on('data', (chunk) => {
                 chunks.push(chunk);
             });
