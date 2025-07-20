@@ -91,7 +91,11 @@ export class Database implements DatabaseClient {
   }
 
   async createUser(telegramId: string, chatId: string): Promise<void> {
-    await this.db.run('INSERT INTO users (telegram_id, chat_id) VALUES (?, ?)', telegramId, chatId);
+    await this.db.run(
+      'INSERT OR IGNORE INTO users (telegram_id, chat_id) VALUES (?, ?)',
+      telegramId,
+      chatId
+    );
   }
 
 

@@ -22,6 +22,8 @@ bot.on('message', async (msg) => {
     return;
   }
 
+  console.log(`Message from ${userId}: ${msg.text} with photo ${!!msg.photo}`);
+
   let user: User | undefined = await db.getUser(userId);
   if (!user) {
     await db.createUser(userId, chatId);
