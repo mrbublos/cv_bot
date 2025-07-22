@@ -90,6 +90,10 @@ export class Database implements DatabaseClient {
     return this.db.get('SELECT * FROM users WHERE telegram_id = ?', telegramId);
   }
 
+  async getUsers(): Promise<User[]> {
+    return this.db.all('SELECT * FROM users');
+  }
+
   async createUser(telegramId: string, chatId: string): Promise<void> {
     await this.db.run(
       'INSERT OR IGNORE INTO users (telegram_id, chat_id) VALUES (?, ?)',
