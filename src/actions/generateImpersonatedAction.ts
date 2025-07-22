@@ -7,7 +7,6 @@ export class GenerateImpersonatedAction extends Action {
     public async execute(context: ActionContext): Promise<void> {
         const { bot, msg, user } = context;
         const chatId = msg.chat.id.toString();
-        let userId = user.id.toString();
         const text = msg.text?.trim();
 
         const impersonatedUser = text?.split(' ')?.[1];
@@ -16,7 +15,8 @@ export class GenerateImpersonatedAction extends Action {
             return;
         }
 
-        userId = impersonatedUser;
+        const userId = impersonatedUser;
+        const prompt = text?.trim()?.replace(`/generate ${userId}`, '')?.trim();
 
         try {
             // Check if user has a trained model
@@ -31,9 +31,9 @@ export class GenerateImpersonatedAction extends Action {
 
             // Call the model's infer function with proper parameters
             const result = await this.modelClient.infer({
-                userId: impersonatedUser,
+                userId,
                 inputData: {
-                    prompt: text,
+                    prompt,
                     width: 1024,  // Default width
                     height: 1024, // Default height
                     loraStyles: [], // Empty array as stub
@@ -42,8 +42,8 @@ export class GenerateImpersonatedAction extends Action {
             });
 
             if (result.success) {
-                this.bot.sendMessage(chatId, '⏳ Generating image as user ' + impersonatedUser + '...');
-                this.jobManager.createJob('generate-image', { impersonatedUser, chatId, jobId: result.jobId });
+                this.bot.sendMessage(chatId, '⏳ Generating image as user ' + userId + '...');
+                this.jobManager.createJob('generate-image', { userId, chatId, jobId: result.jobId });
             } else {
                 throw new Error(result.error || 'Failed to generate image');
             }
