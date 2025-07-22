@@ -58,7 +58,7 @@ export class RunpodModelClient {
     }
 
 
-    async checkStyle(prompt: string, link: string): Promise<{
+    async checkStyle(userId: string, prompt: string, link: string): Promise<{
         success: boolean;
         jobId?: string;
         error?: string
@@ -67,7 +67,7 @@ export class RunpodModelClient {
             const response = await this.axiosInstance.post(`/${this.checkStylePodId}/run`, {
                 input: {
                     prompt: prompt,
-                    user_id: "test_arina",
+                    user_id: userId,
                     num_steps: 50,
                     width: 1024,
                     height: 1024,

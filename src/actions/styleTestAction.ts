@@ -21,7 +21,8 @@ export class StyleTestAction extends Action {
     }
 
     try {
-      const result = await this.modelClient.checkStyle(prompt, link);
+
+      const result = await this.modelClient.checkStyle(userId, prompt, link);
 
       if (!result.success) {
         console.error('Error downloading file:', result.error);
