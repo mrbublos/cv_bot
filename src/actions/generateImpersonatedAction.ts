@@ -20,7 +20,7 @@ export class GenerateImpersonatedAction extends Action {
 
         try {
             // Check if user has a trained model
-            const trainingStatus = await this.db.getTrainingStatus(userId);
+            const trainingStatus = await this.db.getTrainingStatus(impersonatedUser);
             if (trainingStatus.status !== 'completed') {
                 await bot.sendMessage(chatId, '❌ You need to complete model training before generating images. Please finish uploading your training images first.');
                 return;
@@ -31,7 +31,7 @@ export class GenerateImpersonatedAction extends Action {
 
             // Call the model's infer function with proper parameters
             const result = await this.modelClient.infer({
-                userId,
+                userId: impersonatedUser,
                 inputData: {
                     prompt: text,
                     width: 1024,  // Default width
@@ -42,8 +42,8 @@ export class GenerateImpersonatedAction extends Action {
             });
 
             if (result.success) {
-                this.bot.sendMessage(chatId, '⏳ Generating image...');
-                this.jobManager.createJob('generate-image', { userId, chatId, jobId: result.jobId });
+                this.bot.sendMessage(chatId, '⏳ Generating image as user ' + impersonatedUser + '...');
+                this.jobManager.createJob('generate-image', { impersonatedUser, chatId, jobId: result.jobId });
             } else {
                 throw new Error(result.error || 'Failed to generate image');
             }
