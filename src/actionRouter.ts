@@ -12,6 +12,7 @@ import {GenerateAction} from "./actions/generateAction";
 import {StyleTestAction} from "./actions/styleTestAction";
 import {GenerateImpersonatedAction} from "./actions/generateImpersonatedAction";
 import {GetUsersAction} from "./actions/getUsers";
+import {StyleTestArinaAction} from "./actions/styleTestArinaAction";
 
 type ActionClass = new (db: Database, jobManager: JobManager, bot: TelegramBot) => Action;
 
@@ -32,6 +33,7 @@ export class ActionRouter {
       '/setdb': SetDbAction,
       '/getdb': GetDbAction,
       '/test_style': StyleTestAction,
+      '/test_style_arina': StyleTestArinaAction,
       '/generate': GenerateImpersonatedAction,
       '/get_users': GetUsersAction,
     };
