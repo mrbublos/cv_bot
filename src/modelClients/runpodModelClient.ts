@@ -71,8 +71,8 @@ export class RunpodModelClient {
                     num_steps: 50,
                     width: 1024,
                     height: 1024,
-                    min_scale: 0.6,
-                    max_scale: 1.4,
+                    min_scale: 0.3,
+                    max_scale: 1.2,
                     scale_step: 0.1,
                     style_link: link
                 }

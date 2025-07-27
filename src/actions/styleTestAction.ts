@@ -8,11 +8,20 @@ export class StyleTestAction extends Action {
   public async execute(context: ActionContext): Promise<void> {
     const { bot, msg, user } = context;
     const chatId = msg.chat.id.toString();
-    const userId = user.id.toString();
+    let userId = user.id.toString();
 
     const text = msg.text || ''
     const parts = text.split(' ');
-    const [command, link, ...promptParts] = parts;
+    let [_, link, ...promptParts] = parts;
+
+
+    if (!isNaN(+link)) {
+      // its an id of user
+      userId = link
+      link = promptParts[0]
+      promptParts = promptParts.slice(1)
+    }
+
     const prompt = promptParts.join(' ');
 
     if (!link || !prompt) {
