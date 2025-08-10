@@ -48,8 +48,8 @@ export class InferenceStatusJob implements JobHandler<InferenceStatusJobPayload>
 
   async onSuccess(result: any, job: JobData<InferenceStatusJobPayload>): Promise<void> {
     console.log(`InferenceStatusJob completed for job ${job.id}`);
-    const image = await s3Client.load(result.image);
-    this.bot.sendPhoto(job.payload.chatId, image);
+    // const image = await s3Client.load(result.image);
+    this.bot.sendPhoto(job.payload.chatId, Buffer.from(result.image, 'base64'));
     s3Client.delete(result.image);
   }
 

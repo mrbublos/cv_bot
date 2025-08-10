@@ -1,9 +1,10 @@
 import {Action, ActionContext} from './baseAction';
 import {RunpodModelClient} from "../modelClients/runpodModelClient";
+import {getModelClient} from "../modelClients/modelClient";
 
 export class StyleTestAction extends Action {
 
-  modelClient = new RunpodModelClient();
+  modelClient = getModelClient();
 
   public async execute(context: ActionContext): Promise<void> {
     const { bot, msg, user } = context;

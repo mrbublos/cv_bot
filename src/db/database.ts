@@ -155,7 +155,12 @@ export class Database implements DatabaseClient {
     await this.db.run(
       `INSERT INTO training_status
        (user_id, status, started_at, completed_at, training_parameters) 
-       VALUES (?, ?, CURRENT_TIMESTAMP, NULL, ?)`,
+       VALUES (?, ?, CURRENT_TIMESTAMP, NULL, ?)
+       ON CONFLICT(user_id) DO UPDATE SET
+         status = 'in_progress',
+         started_at = CURRENT_TIMESTAMP,
+         completed_at = NULL,
+         training_parameters = excluded.training_parameters`,
       userId,
       'in_progress',
       paramsJson

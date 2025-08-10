@@ -26,6 +26,11 @@ export const config = {
         inference: {
             numSteps: +(process.env.INFERENCE_NUM_STEPS ?? 50),
         },
+        modal: {
+            url: process.env.MODAL_URL,
+            key: process.env.MODAL_KEY,
+            secret: process.env.MODAL_SECRET,
+        },
         training: {
             numSteps: +(process.env.TRAINING_NUM_STEPS ?? 1000),
         },
