@@ -292,9 +292,9 @@ export class ModalModelClient {
     async pollJobStatus(jobId: string): Promise<{ success: boolean; status: string; data?: any; error?: string }> {
         try {
             const response = await this.axiosInstance.post(`/status/${jobId}`);
-            console.log("polling response", response.data);
+            // console.log("polling response", response.data);
 
-            let status = response.data.result ?? response.data.status;
+            let status = response.data.result?.toString() ?? response.data?.status?.toString();
             switch (status.toLowerCase()) {
                 case 'pending':
                     status = 'PENDING';
