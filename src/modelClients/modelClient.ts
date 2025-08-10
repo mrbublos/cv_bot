@@ -3,5 +3,5 @@ import {RunpodModelClient} from "./runpodModelClient";
 import {ModalModelClient} from "./modalModelClient";
 
 export function getModelClient() {
-    return new ModalModelClient();
+    return new RunpodModelClient();
 }
